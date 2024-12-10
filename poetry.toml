@@ -1,0 +1,4 @@
+virtualenvs.in-project=true
+virtualenvs.create=true
+installer.modern-installation=true
+

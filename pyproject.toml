@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "awsjavakit-cfn-rules"
+version = "0.1.0"
+description = ""
+authors = ["Orestis Gkorgkas <orestis.gorgas@gmail.com>"]
+readme = "README.md"
+packages = [{include = ""}]
+
+[tool.poetry.dependencies]
+python = "^3.10.15"
+
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "7.2.2"
+assertpy = "1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+python_files = "*test.py"
+python_classes = "*Test"
+python_functions = "should_*"
+
