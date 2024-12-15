@@ -3,12 +3,16 @@ from typing import List
 from cfnlint.rules import CloudFormationLintRule, RuleMatch
 from cfnlint.template.template import Template
 
+SAMPLE_TEMPLATE_RULE_ID = "ES9001"
+
+EMPTY_DICT = {}
+
+
 class SampleTemplateRule(CloudFormationLintRule):
 
-    id = "ES9001"  # noqa: VNE003
-    shortdesc = "Lambda Event Source Mapping Destination"
-    description = "Ensure Lambda event source mappings have a destination configured"
-    source_url = "https://awslabs.github.io/serverless-rules/rules/lambda/eventsourcemapping_failure_destination/"
+    id = SAMPLE_TEMPLATE_RULE_ID
+    shortdesc = "Demo Rule"
+    description = "A rule for checking that testing works"
     tags = ["lambda"]
     experimental = False
 
@@ -16,8 +20,8 @@ class SampleTemplateRule(CloudFormationLintRule):
         matches = []
 
         for key, value in cfn.get_resources(["AWS::Lambda::Function"]).items():
-            tracing_mode = value.get("Properties", {}).get("TracingConfig", {}).get("Mode", None)
+            function_name = value.get("FunctionName", EMPTY_DICT)
 
-            if tracing_mode != "Active":
-                matches.append(RuleMatch(["Resources", key], "Tracing Config has not been set to active"))
+            if function_name != "MyFunction":
+                matches.append(RuleMatch(["Resources", key], "Function Name should be MyFunctionName"))
         return matches
