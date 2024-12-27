@@ -24,7 +24,7 @@ class TagsRule(CloudFormationLintRule):
 
             if self.__is_empty_dict__(tags):
                 matches.append(RuleMatch(path=["Resources", value],
-                                         message="Lambda Function should be tagged"))
+                                         message="Lambda Function should be taggedddd"))
         return matches
 
     def __is_empty_dict__(self, tags: dict) -> bool:

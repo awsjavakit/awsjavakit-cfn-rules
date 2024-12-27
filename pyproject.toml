@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "awsjavakit-cfn-rules"
-version = "0.0.1"
+version = "0.0.3"
 description = "My CFN rules"
 authors = ["Orestis Gkorgkas <orestis.gorgas@gmail.com>"]
 readme = "README.md"
@@ -28,6 +28,10 @@ build-backend = "poetry.core.masonry.api"
 #[tool.poetry.plugins]
 #export= 'poetry-plugin-export'
 
+
+
+[project.urls]
+Homepage = "https://github.com/awsjavakit/awsjavakit-cfn-rules"
 
 [tool.pytest.ini_options]
 python_files = "*test.py"

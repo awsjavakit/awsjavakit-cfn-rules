@@ -13,6 +13,7 @@ poetry-update: .venv
 	. .venv/bin/activate && poetry update && deactivate
 
 poetry-export: .venv
+	rm -rf dist
 	. .venv/bin/activate && poetry build && deactivate
 	. .venv/bin/activate && poetry export -f requirements.txt --output requirements.txt && deactivate
 
@@ -22,6 +23,10 @@ local-install: poetry-export
 clean:
 	rm -rf dist
 	rm -rf .venv
+
+publish: poetry-export
+	. .venv/bin/activate && python -m pip install build twine && deactivate
+	. .venv/bin/activate && python -m twine upload -r testpypi -u __token__ -p ${PYPI_TOKEN} dist/* && deactivate
 
 cfn-lint:
 	. .venv/bin/activate && cfn-lint && deactivate
