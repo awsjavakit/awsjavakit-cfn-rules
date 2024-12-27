@@ -2,6 +2,8 @@ name: build-and-validate
 
 on:
   pull_request:
+    types:
+      - closed
     branches:
       - main
 
@@ -18,6 +20,9 @@ jobs:
           cache: poetry
           architecture: arm64
           check-latest: true
+      - name: publish-artifacts
+        run: |
+          make publish
 
 
 
