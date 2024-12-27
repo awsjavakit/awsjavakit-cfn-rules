@@ -3,7 +3,7 @@ from typing import List
 from cfnlint.rules import CloudFormationLintRule, RuleMatch
 from cfnlint.template.template import Template
 
-SAMPLE_TEMPLATE_RULE_ID = "ES9002"
+SAMPLE_TEMPLATE_RULE_ID = "E9001"
 
 EMPTY_DICT = {}
 
@@ -11,8 +11,8 @@ EMPTY_DICT = {}
 class TagsRule(CloudFormationLintRule):
 
     id = SAMPLE_TEMPLATE_RULE_ID
-    shortdesc = "Missing Tags Rule"
-    description = "A rule for checking that all resources requiring tags have tags"
+    shortdesc = "Missing Tags Rule for Lambdas"
+    description = "A rule for checking that all lambdas have tags"
     tags = ["tags"]
     experimental = False
 
