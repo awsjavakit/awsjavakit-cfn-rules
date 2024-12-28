@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: 3.13
           cache: poetry
-          architecture: arm64
+          architecture: x64
           check-latest: true
       - name: publish-artifacts
         run: |
