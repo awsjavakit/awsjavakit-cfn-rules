@@ -18,7 +18,7 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v5.3.0
         with:
-          python-version: 3.13.1
+          python-version: 3.13
           cache: poetry
           architecture: arm64
           check-latest: true
