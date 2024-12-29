@@ -8,7 +8,7 @@ on:
       - main
 
 jobs:
-  publish:
+  build:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-22.04
     environment: testpypi
@@ -23,30 +23,34 @@ jobs:
           python-version: 3.13
           architecture: x64
           check-latest: true
+      - name: Build a binary wheel and a source tarball
+        run: make poetry-export
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
 
-      - name: mint API token
-        id: mint-token
-        run: |
-          # retrieve the ambient OIDC token
-          resp=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=testpypi")
-          oidc_token=$(jq -r '.value' <<< "${resp}")
-          
-          # exchange the OIDC token for an API token
-          resp=$(curl -X POST https://test.pypi.org/_/oidc/mint-token -d "{\"token\": \"${oidc_token}\"}")
-          api_token=$(jq -r '.token' <<< "${resp}")
-          
-          # mask the newly minted API token, so that we don't accidentally leak it
-          echo "${api_token}"
-
-          # see the next step in the workflow for an example of using this step output
-          echo "api-token=${api_token}" >> "${GITHUB_OUTPUT}"
-      - name: publish-artifacts
-        env:
-          PYPI_TOKEN: ${{ steps.mint-token.outputs.api-token }}
-        run: |
-          make publish
-
+  publish:
+    name: Publish to TestPyPI
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/awsjavakit-cfn-rules
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distribution 📦 to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
 
 
 
