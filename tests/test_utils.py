@@ -15,7 +15,7 @@ class ParsedJson:
 class TestUtils:
 
     @staticmethod
-    def get_templates(path:str="templates") -> List[str]:
+    def get_templates(path:str) -> List[str]:
         template_folder = os.path.join(os.path.dirname(__file__), path)
         template_filenames = os.listdir(template_folder)
         full_paths = map(lambda filename: os.path.join(template_folder, filename), template_filenames)

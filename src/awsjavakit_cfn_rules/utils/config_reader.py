@@ -1,20 +1,11 @@
+from __future__ import annotations
 from pathlib import Path
 from typing import override
 
 import yaml
 from attrs import define
-
-
-@define(repr=False, str=False)
-class RuleId:
-    rule_id: str
-
-    def __str__(self) -> str:
-        return self.rule_id
-
-    def __repr__(self) -> str:
-        return self.__str__()
-
+from .missing_config_exception import MissingConfigException
+from .rule_id import RuleId
 
 @define(init=True, eq=True, frozen=True)
 class Config:
@@ -38,7 +29,10 @@ class FileConfigReader(ConfigReader):
     def fetch_config(self, rule_id: RuleId) -> Config:
         config_text: str = self.file_path.read_text(encoding='utf-8')
         config_value: dict = yaml.safe_load(config_text)
-
-        return Config(config_value.get("configure_rules").get(str(rule_id)))
+        ruleConfig = config_value.get("configure_rules").get(str(rule_id))
+        if ruleConfig is not  None:
+            return Config(ruleConfig)
+        else:
+            raise MissingConfigException(rule_id)
 
 

@@ -6,11 +6,11 @@ from assertpy import assert_that
 class TestUtilsTest:
 
     def should_list_template_files(self):
-        template_files = TestUtils.get_templates()
-        assert_that(template_files).is_length(1)
+        template_files = TestUtils.get_templates("templates/tags_rule")
+        assert_that(len(template_files)).is_greater_than_or_equal_to(1)
 
     def should_parse_template(self):
-        template_files = TestUtils.get_templates()
+        template_files = TestUtils.get_templates("templates/tags_rule")
         parsed_jsons = map(lambda file:TestUtils.parsed_template(file), template_files)
         templates = map(lambda parsed_json: Template(parsed_json.filename,parsed_json.jsondoc),parsed_jsons)
         for template in templates:

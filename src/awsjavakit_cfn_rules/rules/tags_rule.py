@@ -2,6 +2,8 @@ from typing import List
 
 from cfnlint.rules import CloudFormationLintRule, RuleMatch
 from cfnlint.template.template import Template
+from utils.config_reader import Config, FileConfigReader, ConfigReader
+from pathlib import Path
 
 SAMPLE_TEMPLATE_RULE_ID = "E9001"
 
@@ -16,6 +18,10 @@ class TagsRule(CloudFormationLintRule):
     tags = ["tags"]
     experimental = False
 
+    def __init__(self, config: Config = FileConfigReader(Path(".cfnlintrc"))):
+        super().__init__()
+        self.config = config
+
     def match(self, cfn: Template) -> List[RuleMatch]:
         matches = []
 
@@ -24,7 +30,7 @@ class TagsRule(CloudFormationLintRule):
 
             if self.__is_empty_dict__(tags):
                 matches.append(RuleMatch(path=["Resources", value],
-                                         message="Lambda Function should be taggedddd"))
+                                         message="Lambda Function should be tagged"))
         return matches
 
     def __is_empty_dict__(self, tags: dict) -> bool:

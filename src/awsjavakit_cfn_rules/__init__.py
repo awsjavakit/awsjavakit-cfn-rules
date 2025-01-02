@@ -1,4 +1,4 @@
-from .tags_rule import (
+from .rules.tags_rule import (
     TagsRule
 )
 __all__ = [
