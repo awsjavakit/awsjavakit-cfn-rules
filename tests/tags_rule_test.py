@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import os.path
+
+import pytest
 from typing import List
 
 import cfnlint
 from assertpy import assert_that
 from cfnlint import Template, core
-import pytest
 
-from src.awsjavakit_cfn_rules.rules import tags_rule
+from tests import RESOURCES
+
+from src.awsjavakit_cfn_rules.rules import RULES_FOLDER, tags_rule
 from tests.test_utils import TestUtils
 from tests.test_utils import ParsedJson
 from src.awsjavakit_cfn_rules.utils.config_reader import    Config
@@ -16,12 +20,15 @@ from src.awsjavakit_cfn_rules.rules.tags_rule import TagsRule
 DEMO_RULE = "ES9001"
 
 
+
 class TagsRuleTest:
 
     @staticmethod
     @pytest.fixture
     def demo_templates() -> List[ParsedJson]:
-        template_files = TestUtils.get_templates("templates/tags_rule")
+
+        templates_folder = (RESOURCES / "templates" / "tags_rule").absolute()
+        template_files = TestUtils.get_templates(templates_folder)
         parsed_jsons = map(lambda file: TestUtils.parsed_template(file), template_files)
         return list(parsed_jsons)
 
@@ -34,7 +41,8 @@ class TagsRuleTest:
     @staticmethod
     def should_report_error_when_resource_does_not_have_tag(demo_template):
         template = Template(demo_template.filename, demo_template.jsondoc)
-        rules = cfnlint.core.get_rules(append_rules=["../src/awsjavakit_cfn_rules"], ignore_rules=[DEMO_RULE], include_experimental=False,
+
+        rules = cfnlint.core.get_rules(append_rules=[str(RULES_FOLDER)], ignore_rules=[DEMO_RULE], include_experimental=False,
                                        include_rules=[],)
         results = cfnlint.core.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
                                           template=template.template)

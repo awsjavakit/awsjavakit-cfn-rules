@@ -2,7 +2,7 @@ from typing import List
 
 from cfnlint.rules import CloudFormationLintRule, RuleMatch
 from cfnlint.template.template import Template
-from utils.config_reader import Config, FileConfigReader, ConfigReader
+from src.awsjavakit_cfn_rules.utils.config_reader import Config, FileConfigReader
 from pathlib import Path
 
 SAMPLE_TEMPLATE_RULE_ID = "E9001"

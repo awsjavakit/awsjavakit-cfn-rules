@@ -1,3 +1,4 @@
+import os.path
 import random
 import string
 from pathlib import Path
@@ -5,8 +6,8 @@ from pathlib import Path
 import pytest
 from assertpy import assert_that, fail
 
-from utils.config_reader import FileConfigReader, RuleId
-
+from src.awsjavakit_cfn_rules.utils.config_reader import FileConfigReader, RuleId
+from tests import RESOURCES
 
 class FileConfigReaderTest:
 
@@ -35,7 +36,7 @@ class FileConfigReaderTest:
     @staticmethod
     @pytest.fixture(scope="function")
     def config_file_path() -> Path:
-        file_path = Path("resources", ".sample_cfnlintrc")
+        file_path = RESOURCES / ".sample_cfnlintrc"
         return file_path
 
     @staticmethod

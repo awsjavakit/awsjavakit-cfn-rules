@@ -4,8 +4,8 @@ from typing import override
 
 import yaml
 from attrs import define
-from .missing_config_exception import MissingConfigException
-from .rule_id import RuleId
+from src.awsjavakit_cfn_rules.utils.missing_config_exception import MissingConfigException
+from src.awsjavakit_cfn_rules.utils.rule_id import RuleId
 
 @define(init=True, eq=True, frozen=True)
 class Config:
