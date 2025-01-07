@@ -1,4 +1,4 @@
-import os.path
+
 import random
 import string
 from pathlib import Path
@@ -6,8 +6,9 @@ from pathlib import Path
 import pytest
 from assertpy import assert_that, fail
 
-from src.awsjavakit_cfn_rules.utils.config_reader import FileConfigReader, RuleId
 from tests import RESOURCES
+from utils.config_reader import FileConfigReader, RuleId
+
 
 class FileConfigReaderTest:
 

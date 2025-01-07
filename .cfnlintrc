@@ -3,8 +3,8 @@ templates:
 append_rules:
   - awsjavakit_cfn_rules
 configure_rules:
-    E9002:
-        some_key: some_value
+    E9001:
+        main_key: some_value
 
 
 

@@ -1,8 +1,8 @@
-from tests import RESOURCES, TEMPLATES
-from tests.test_utils import TestUtils
-
-from cfnlint.template.template import Template
 from assertpy import assert_that
+from cfnlint.template.template import Template
+
+from tests import TEMPLATES
+from tests.test_utils import TestUtils
 
 
 class TestUtilsTest:

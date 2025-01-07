@@ -1,21 +1,18 @@
 from __future__ import annotations
 
-import os.path
-
-import pytest
 from typing import List
 
 import cfnlint
+import pytest
 from assertpy import assert_that
 from cfnlint import Template, core
 
-from tests import RESOURCES
-
-from src.awsjavakit_cfn_rules.rules import RULES_FOLDER, tags_rule
-from tests.test_utils import TestUtils
-from tests.test_utils import ParsedJson
-from src.awsjavakit_cfn_rules.utils.config_reader import    Config
+from awsjavakit_cfn_rules.rules import tags_rule
+from src.awsjavakit_cfn_rules.rules import RULES_FOLDER
 from src.awsjavakit_cfn_rules.rules.tags_rule import TagsRule
+from src.utils.config_reader import Config
+from tests import RESOURCES
+from tests.test_utils import ParsedJson, TestUtils
 
 DEMO_RULE = "ES9001"
 
@@ -50,7 +47,13 @@ class TagsRuleTest:
         assert_that(expected_failure.message).is_equal_to("Lambda Function should be tagged")
 
     @staticmethod
-    def should_accept_a_rule_config_file():
+    def should_accept_a_rule_config():
         config = Config({"some_key":"some_value"})
         tags_rule = TagsRule(config=config)
         assert_that(tags_rule.config).is_equal_to(config)
+
+    @staticmethod
+    def should_read_the_config_file_in_the_root_folder_by_default():
+        config = Config({"main_key": "some_value"})
+        tags_rule = TagsRule()
+        assert_that(tags_rule.config == config).is_true()
