@@ -1,5 +1,5 @@
 
-.PHONY: setup update wheel poetry-export local-install
+.PHONY: setup update wheel poetry-export local-install test
 
 .venv:
 	python -m venv .venv
@@ -19,6 +19,9 @@ poetry-export: .venv
 
 local-install: poetry-export
 	. .venv/bin/activate && python -m pip install --force-reinstall dist/awsjavakit_cfn_rules-0.0.1-py3-none-any.whl && deactivate
+
+test: .venv
+	. .venv/bin/activate && poetry run pytest && deactivate
 
 clean:
 	rm -rf dist
