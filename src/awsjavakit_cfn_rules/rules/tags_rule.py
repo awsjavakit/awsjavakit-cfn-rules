@@ -5,8 +5,8 @@ from typing import List
 from cfnlint.rules import CloudFormationLintRule, RuleMatch
 from cfnlint.template.template import Template
 
-from utils.rule_id import RuleId
-from utils.config_reader import Config, FileConfigReader
+from awsjavakit_cfn_rules.rules.utils.rule_id import RuleId
+from awsjavakit_cfn_rules.rules.utils.config_reader import Config, FileConfigReader
 
 SAMPLE_TEMPLATE_RULE_ID = "E9001"
 

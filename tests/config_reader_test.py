@@ -7,7 +7,8 @@ import pytest
 from assertpy import assert_that, fail
 
 from tests import RESOURCES
-from utils.config_reader import FileConfigReader, RuleId
+from awsjavakit_cfn_rules.rules.utils.config_reader import FileConfigReader
+from awsjavakit_cfn_rules.rules.utils.rule_id import RuleId
 
 
 class FileConfigReaderTest:

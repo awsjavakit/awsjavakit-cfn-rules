@@ -1,5 +1,5 @@
 templates:
-  - tests/templates/**/*.yaml
+  - tests/resources/templates/**/*.yaml
 append_rules:
   - awsjavakit_cfn_rules
 configure_rules:

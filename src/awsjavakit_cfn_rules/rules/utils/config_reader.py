@@ -4,8 +4,8 @@ from typing import override
 
 import yaml
 from attrs import define, field
-from utils.missing_config_exception import MissingConfigException
-from utils.rule_id import RuleId
+from awsjavakit_cfn_rules.rules.utils.missing_config_exception import MissingConfigException
+from awsjavakit_cfn_rules.rules.utils.rule_id import RuleId
 
 
 def _default_config_file_() -> Path:
@@ -14,7 +14,7 @@ def _default_config_file_() -> Path:
 
 @define(init=True, eq=False, frozen=True,order=False)
 class Config:
-    _values: field(type=dict,eq=)
+    _values: field(type=dict)
 
     def values(self) -> dict:
         return self._values

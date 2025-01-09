@@ -8,9 +8,9 @@ from assertpy import assert_that
 from cfnlint import Template, core
 
 from awsjavakit_cfn_rules.rules import tags_rule
-from src.awsjavakit_cfn_rules.rules import RULES_FOLDER
-from src.awsjavakit_cfn_rules.rules.tags_rule import TagsRule
-from src.utils.config_reader import Config
+from awsjavakit_cfn_rules.rules import RULES_FOLDER
+from awsjavakit_cfn_rules.rules.tags_rule import TagsRule
+from awsjavakit_cfn_rules.rules.utils.config_reader import Config
 from tests import RESOURCES
 from tests.test_utils import ParsedJson, TestUtils
 

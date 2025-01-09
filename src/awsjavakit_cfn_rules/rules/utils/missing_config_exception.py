@@ -1,6 +1,6 @@
 import os
 from typing import override
-from utils.rule_id import RuleId
+from awsjavakit_cfn_rules.rules.utils.rule_id import RuleId
 
 class MissingConfigException(RuntimeError):
 
