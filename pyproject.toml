@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "awsjavakit-cfn-rules"
-version = "0.0.1"
+version = "0.0.2"
 description = "My CFN rules"
 authors = ["Orestis Gkorgkas <orestis.gorgas@gmail.com>"]
 readme = "README.md"
@@ -12,7 +12,7 @@ package-mode = true
 
 [tool.poetry.dependencies]
 python = "^3.10.15"
-cfn-lint = "1.21.0"
+cfn-lint = "^1.21.0"
 attrs = "24.2.0"
 flake8 = '7.1.1'
 
@@ -20,6 +20,7 @@ flake8 = '7.1.1'
 pytest = "7.2.2"
 assertpy = "1.1"
 PyYAML= '6.0.2'
+Faker= "33.1.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -30,6 +31,7 @@ build-backend = "poetry.core.masonry.api"
 
 
 
+
 [project.urls]
 Homepage = "https://github.com/awsjavakit/awsjavakit-cfn-rules"
 
@@ -37,4 +39,4 @@ Homepage = "https://github.com/awsjavakit/awsjavakit-cfn-rules"
 python_files = "*test.py"
 python_classes = "*Test"
 python_functions = "should_*"
-
+pythonpath = ["src"]
