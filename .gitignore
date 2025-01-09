@@ -10,6 +10,8 @@ requirements.txt
 #AWS SAM
 samconfig.toml
 .aws-sam
+.gitignore
+
 # Node artifact files
 node_modules/
 dist/
