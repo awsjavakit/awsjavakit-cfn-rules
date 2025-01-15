@@ -2,9 +2,11 @@ templates:
   - tests/resources/templates/**/*.yaml
 append_rules:
   - awsjavakit_cfn_rules
+
 configure_rules:
     E9001:
-        main_key: some_value
+        expected_tags:
+            - expectedTag
 
 
 

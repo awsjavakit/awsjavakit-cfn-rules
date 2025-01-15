@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Resources:
+  ServerlessFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Runtime: python3.10
+      Handler: main.handler
+      Tags:
+        expectedTag: theFunction
+#
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: nodejs20.x
+      Role: arn:aws:iam::111122223333:role/lambda-role
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          const { S3Client, ListBucketsCommand } = require("@aws-sdk/client-s3");
+          const s3 = new S3Client({ region: "us-east-1" }); // replace "us-east-1" with your AWS Region
+
+          exports.handler = async function(event) {
+            const command = new ListBucketsCommand({});
+            const response = await s3.send(command);
+            return response.Buckets;
+          };
+      Description: Some example found in AWS
+      TracingConfig:
+        Mode: Active
+      Tags:
+        - Key: expectedTag
+          Value: theFunction
