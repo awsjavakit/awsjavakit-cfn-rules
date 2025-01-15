@@ -31,18 +31,17 @@ Finally run `cfn-lint` to run the cfn-lint.
 ## Implemented rules:
 
 ### E9001 Tags Rule:
-    It checks whether resources (currently only Lambda functions) have the desired tags
-    Example:
-        ```
-            templates:
-                - tests/resources/templates/**/*.yaml
-            append_rules:
-                - awsjavakit_cfn_rules
+It checks whether resources (currently only Lambda functions) have the desired tags. Example:
+```
+templates:
+    - tests/resources/templates/**/*.yaml
+append_rules:
+    - awsjavakit_cfn_rules
 
-            configure_rules:
-                E9001:
-                    expected_tags:
-                        - expectedTag
+configure_rules:
+    E9001:
+        expected_tags:
+            - expectedTag
 
-        ```
+```
     
