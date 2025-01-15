@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Resources:
+  UntaggedFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Runtime: python3.10
+      Handler: main.handler
+
+
+
+  TaggedFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Runtime: python3.10
+      Handler: main.handler
+      Tags:
+        someKey: someValue
