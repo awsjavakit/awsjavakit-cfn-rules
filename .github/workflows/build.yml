@@ -1,0 +1,25 @@
+name: build-and-validate
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    if: github.event.pull_request.merged != true
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup python
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: 3.13
+          architecture: x64
+          check-latest: true
+      - name: Build a binary wheel and a source tarball
+        run: make test
+
+
+
