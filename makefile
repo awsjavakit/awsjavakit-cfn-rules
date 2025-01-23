@@ -22,6 +22,8 @@ local-install: poetry-export
 
 test: .venv
 	. .venv/bin/activate && poetry run pytest && deactivate
+	. .venv/bin/activate && pylint src && deactivate
+	. .venv/bin/activate && pylint tests && deactivate
 
 clean:
 	rm -rf dist
@@ -34,4 +36,5 @@ publish: poetry-export
 
 cfn-lint: .venv
 	. .venv/bin/activate && cfn-lint && deactivate
+
 
