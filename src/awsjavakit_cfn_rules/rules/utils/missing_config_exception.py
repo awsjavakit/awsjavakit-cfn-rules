@@ -9,7 +9,7 @@ class MissingConfigException(RuntimeError):
         super().__init__(self.message(ruleid))
 
     @classmethod
-    def message(cls, ruleid)->str:
+    def message(cls, ruleid:RuleId)->str:
         message = f'Missing configuration for rule {ruleid}'
         example="""
         Add your configuration in the .cflintrc configuration file. 
