@@ -34,3 +34,30 @@ Resources:
       Tags:
         - Key: expectedTag
           Value: theFunction
+
+
+  ManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:ListBucket
+            Resource: "*"
+      ManagedPolicyName: MyManagedPolicy
+
+  IAMPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: MyPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - ec2:DescribeInstances
+            Resource: "*"
+      Roles:
+        - arn:aws:iam::111122223333:role/example-role

@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Resources:
+
+  SomeInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AdditionalInfo: "Additional information about the instance"
+      Affinity: "host"
+      AvailabilityZone: "us-west-2a"
+      BlockDeviceMappings:
+        - DeviceName: "/dev/sdh"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 100
+            VolumeType: "gp2"
+      CpuOptions:
+        CoreCount: 2
+        ThreadsPerCore: 2
+      CreditSpecification:
+        CPUCredits: "standard"
+      DisableApiTermination: false
+      EbsOptimized: true
+      ElasticGpuSpecifications:
+        - Type: "eg1.medium"
+      ElasticInferenceAccelerators:
+        - Type: "eia1.medium"
+      EnclaveOptions:
+        Enabled: false
+      HibernationOptions:
+        Configured: false
+      HostId: "host-id"
+      HostResourceGroupArn: "arn:aws:resource-groups:us-west-2:123456789012:group/my-resource-group"
+      IamInstanceProfile: "arn:aws:iam::123456789012:instance-profile/my-iam-role"
+      ImageId: "ami-0abcdef1234567890"
+      InstanceInitiatedShutdownBehavior: "stop"
+      InstanceType: "t2.micro"
+      Ipv6AddressCount: 1
+      Ipv6Addresses:
+        - Ipv6Address: "2001:db8:1234:1a00::123"
+      KernelId: "aki-88aa75e1"
+      KeyName: "my-key-pair"
+      LaunchTemplate:
+        LaunchTemplateId: "lt-0abcd1234efgh5678"
+        Version: "1"
+      LicenseSpecifications:
+        - LicenseConfigurationArn: "arn:aws:license-manager:us-west-2:123456789012:license-configuration:lic-1234567890abcdef"
+      Monitoring: true
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          SubnetId: "subnet-0bb1c79de3EXAMPLE"
+      PlacementGroupName: "my-placement-group"
+      PrivateDnsNameOptions:
+        EnableResourceNameDnsARecord: true
+        EnableResourceNameDnsAAAARecord: true
+        HostnameType: "ip-name"
+      PrivateIpAddress: "10.0.0.1"
+      PropagateTagsToVolumeOnCreation: true
+      RamdiskId: "ari-88aa75e1"
+      SecurityGroupIds:
+        - "sg-903004f8"
+      SecurityGroups:
+        - "my-security-group"
+      SourceDestCheck: true
+      SsmAssociations:
+        - AssociationId: "association-id"
+          DocumentName: "AWS-RunShellScript"
+          InstanceId: "i-1234567890abcdef0"
+          Parameters:
+            commands:
+              - "echo Hello World"
+      SubnetId: "subnet-0bb1c79de3EXAMPLE"
+      Tags:
+        - Key: "Name"
+          Value: "MyEC2Instance"
+      Tenancy: "default"
+      UserData: "IyEvYmluL2Jhc2gKZWNobyBIZWxsbyBXb3JsZA=="
+      Volumes:
+        - Device: "/dev/sdh"
+          VolumeId: "vol-049df61146c4d7901"

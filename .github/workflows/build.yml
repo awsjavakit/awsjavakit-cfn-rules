@@ -18,7 +18,7 @@ jobs:
           python-version: 3.13
           architecture: x64
           check-latest: true
-      - name: Build a binary wheel and a source tarball
+      - name: run the tests
         run: make test
 
 
