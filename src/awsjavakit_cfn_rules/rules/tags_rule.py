@@ -39,19 +39,23 @@ class TagsRule(CloudFormationLintRule):
         matches = []
         tags_rule_config = TagsRuleConfig(self.config)
 
-        for key, value in cfn.get_resources().items():
-            if self._is_non_taggable_resource_(value):
+        for resource_name, resource in cfn.get_resources().items():
+            if self._is_non_taggable_resource_(resource):
                 continue
-            tags: List[str] = self._extract_tags_(value)
+            tags: List[str] = self._extract_tags_(resource)
             missing_tags = self._calculate_missing_tags_(tags, tags_rule_config)
 
             if self._is_not_empty_(missing_tags):
-                matches.append(RuleMatch(path=["Resources", value],
-                                         message=self._construct_message_(missing_tags,key)))
+                matches.append(RuleMatch(path=["Resources", resource],
+                                         message=self._construct_message_(missing_tags, resource_name,
+                                                                          self._type_of_(resource))))
         return matches
 
-    def _is_non_taggable_resource_(self, template: dict) -> bool:
-        return template.get("Type") in NON_TAGGABLE_RESOURCES
+    def _type_of_(self, resource):
+        return resource.get("Type")
+
+    def _is_non_taggable_resource_(self, resource: dict) -> bool:
+        return self._type_of_(resource) in NON_TAGGABLE_RESOURCES
 
     def _extract_tags_(self, value) -> List[str]:
 
@@ -68,8 +72,8 @@ class TagsRule(CloudFormationLintRule):
     def _is_not_empty_(self, tags: List[str]) -> bool:
         return not (tags is None or tags == [])
 
-    def _construct_message_(self, missing_tags,resource_name: str) -> str:
-        return f"Resource {resource_name} is missing required tags:{str(missing_tags)}"
+    def _construct_message_(self, missing_tags,resource_name: str, resource_type:str) -> str:
+        return f"Resource {resource_name}:{resource_type} is missing required tags:{str(missing_tags)}"
 
 
 @define

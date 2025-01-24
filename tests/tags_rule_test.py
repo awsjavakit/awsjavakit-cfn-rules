@@ -98,5 +98,22 @@ class TagsRuleTest:
                                       )
         results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
                                          template=template.template)
-        failures = results #list(filter(lambda result: result.rule.id == tags_rule.SAMPLE_TEMPLATE_RULE_ID, results))
+        failures = results
         assert_that(failures).is_empty().described_as(template.filename)
+
+    @staticmethod
+    def should_report_resource_name_and_type_when_failing():
+        failing_template = TestUtils.parsed_template(RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
+        template = Template(failing_template.filename, failing_template.jsondoc)
+        expected_tags = ["expectedTag"]
+        config = {tags_rule.EXPECTED_TAGS_FIELD_NAME: expected_tags}
+        rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
+                                      ignore_rules=[],
+                                      include_experimental=False,
+                                      include_rules=[],
+                                      configure_rules={tags_rule.SAMPLE_TEMPLATE_RULE_ID: config}
+                                      )
+        results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
+                                         template=template.template)
+        for failure in results:
+            assert_that(failure.message).contains("UntaggedFunction").contains("AWS::Lambda::Function")
