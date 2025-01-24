@@ -25,7 +25,6 @@ fake.add_provider(lorem)
 class TagsRuleTest:
 
     @staticmethod
-    @pytest.fixture
     def failing_templates() -> List[ParsedJson]:
 
         templates_folder = (RESOURCES / "templates" / "tags_rule" / "failing").absolute()
@@ -42,10 +41,11 @@ class TagsRuleTest:
         parsed_jsons = map(TestUtils.parsed_template, template_files)
         return list(parsed_jsons)
 
+
     @staticmethod
-    @pytest.fixture
-    def failing_template(failing_templates) -> ParsedJson:
-        yield  from failing_templates
+    @pytest.fixture(params=failing_templates())
+    def failing_template(request) -> ParsedJson:
+            yield request.param
 
     @staticmethod
     @pytest.fixture
