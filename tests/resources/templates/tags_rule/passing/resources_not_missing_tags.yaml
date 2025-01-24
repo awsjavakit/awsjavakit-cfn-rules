@@ -66,3 +66,9 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: https://s3.amazonaws.com/cloudformation-templates-us-east-1/S3_Bucket.template
+
+  Screen:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: SomeDashboard
+      DashboardBody: "{}"

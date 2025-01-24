@@ -14,7 +14,8 @@ CONFIG_DEFINITION = {
 
 NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
                           "AWS::IAM::ManagedPolicy",
-                          "AWS::CloudFormation::Stack"}
+                          "AWS::CloudFormation::Stack",
+                          "AWS::CloudWatch::Dashboard"}
 
 SAMPLE_TEMPLATE_RULE_ID = "E9001"
 
