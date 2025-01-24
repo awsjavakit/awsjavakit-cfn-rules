@@ -1,4 +1,22 @@
-# Some custom Cloud Formation rules
+# Additional CloudFormation Rules
+
+## Implemented rules:
+
+### E9001 Tags Rule:
+
+It checks whether resources (currently only Lambda functions) have the desired tags. Example:
+```
+templates:
+    - tests/resources/templates/**/*.yaml
+append_rules:
+    - awsjavakit_cfn_rules
+
+configure_rules:
+    E9001:
+        expected_tags:
+            - expectedTag
+```
+
 
 ### Suggested Usage:
 
@@ -19,6 +37,7 @@ Create a configuration file `.cfnlintrc` like the following:
 ```
 Place the configuration file in the same folder as your template (template.yaml).  
 Afterwards, run the following commands
+
 ```
         python -m venv .cfn-lint-venv
         . .cfn-lint-venv/bin activate
@@ -26,22 +45,8 @@ Afterwards, run the following commands
         pip install awsjavakit-cfn-rules
         
 ```
+
 Finally run `cfn-lint` to run the cfn-lint.
 
-## Implemented rules:
 
-### E9001 Tags Rule:
-It checks whether resources (currently only Lambda functions) have the desired tags. Example:
-```
-templates:
-    - tests/resources/templates/**/*.yaml
-append_rules:
-    - awsjavakit_cfn_rules
-
-configure_rules:
-    E9001:
-        expected_tags:
-            - expectedTag
-
-```
     
