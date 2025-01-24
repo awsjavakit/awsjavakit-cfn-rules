@@ -4,7 +4,7 @@
 
 ### E9001 Tags Rule:
 
-It checks whether resources (currently only Lambda functions) have the desired tags. Example:
+It checks whether resources have the desired tags. Example:
 ```
 templates:
     - tests/resources/templates/**/*.yaml
