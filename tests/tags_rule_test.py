@@ -103,7 +103,8 @@ class TagsRuleTest:
 
     @staticmethod
     def should_report_resource_name_and_type_when_failing():
-        failing_template = TestUtils.parsed_template(RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
+        failing_template = TestUtils.parsed_template(
+            RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
         template = Template(failing_template.filename, failing_template.jsondoc)
         expected_tags = ["expectedTag"]
         config = {tags_rule.EXPECTED_TAGS_FIELD_NAME: expected_tags}
