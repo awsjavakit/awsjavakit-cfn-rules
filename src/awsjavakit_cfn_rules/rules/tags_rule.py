@@ -12,10 +12,9 @@ CONFIG_DEFINITION = {
     EXPECTED_TAGS_FIELD_NAME: {"default": [], "type": "list", "itemtype": "string"}
 }
 
-NON_TAGGABLE_RESOURCES = {
-    "AWS::IAM::Policy": True,
-    "AWS::IAM::ManagedPolicy": True,
-}
+NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
+                          "AWS::IAM::ManagedPolicy",
+                          "AWS::CloudFormation::Stack"}
 
 SAMPLE_TEMPLATE_RULE_ID = "E9001"
 
@@ -39,7 +38,7 @@ class TagsRule(CloudFormationLintRule):
         matches = []
         tags_rule_config = TagsRuleConfig(self.config)
 
-        for _, value in cfn.get_resources().items():
+        for key, value in cfn.get_resources().items():
             if self._is_non_taggable_resource_(value):
                 continue
             tags: List[str] = self._extract_tags_(value)
@@ -47,16 +46,20 @@ class TagsRule(CloudFormationLintRule):
 
             if self._is_not_empty_(missing_tags):
                 matches.append(RuleMatch(path=["Resources", value],
-                                         message=self._construct_message_(missing_tags)))
+                                         message=self._construct_message_(missing_tags,key)))
         return matches
 
     def _is_non_taggable_resource_(self, template: dict) -> bool:
-        return NON_TAGGABLE_RESOURCES.get(template.get("Type")) is True
+        return template.get("Type") in NON_TAGGABLE_RESOURCES
 
     def _extract_tags_(self, value) -> List[str]:
-        tag_entries = value.get("Properties").get("Tags")
+
+        tag_entries = self._extract_tags_as_non_none(value)
         tag_names = list(map(lambda tagEntry: tagEntry.get("Key"), tag_entries))
         return tag_names
+
+    def _extract_tags_as_non_none(self, value):
+        return value.get("Properties", {}).get("Tags", [])
 
     def _calculate_missing_tags_(self, tags: List[str], tags_rule_config: TagsRuleConfig) -> List[str]:
         return list(filter(lambda expected: (expected not in tags), tags_rule_config.expected_tags()))
@@ -64,8 +67,8 @@ class TagsRule(CloudFormationLintRule):
     def _is_not_empty_(self, tags: List[str]) -> bool:
         return not (tags is None or tags == [])
 
-    def _construct_message_(self, missing_tags):
-        return f"Resource is missing required tags:{str(missing_tags)}"
+    def _construct_message_(self, missing_tags,resource_name: str) -> str:
+        return f"Resource {resource_name} is missing required tags:{str(missing_tags)}"
 
 
 @define

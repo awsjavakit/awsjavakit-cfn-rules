@@ -61,3 +61,8 @@ Resources:
             Resource: "*"
       Roles:
         - arn:aws:iam::111122223333:role/example-role
+
+  PulseEventsStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/cloudformation-templates-us-east-1/S3_Bucket.template

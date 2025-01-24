@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Resources:
+  UntaggedFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+        Runtime: nodejs20.x
+        Role: arn:aws:iam::111122223333:role/lambda-role
+        Handler: index.handler
+        Code:
+            ZipFile: |
+                exports.handler = async function(event) {
+                    return "hello"
+                };
+        Description: Some example found in AWS
+        TracingConfig:
+            Mode: Active

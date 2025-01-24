@@ -31,7 +31,6 @@ class TagsRuleTest:
         return list(parsed_jsons)
 
     @staticmethod
-    @pytest.fixture
     def passing_templates() -> List[ParsedJson]:
         templates_folder = (RESOURCES / "templates" / "tags_rule" / "passing").absolute()
         template_files = TestUtils.get_templates(templates_folder)
@@ -44,9 +43,28 @@ class TagsRuleTest:
         yield request.param
 
     @staticmethod
-    @pytest.fixture
-    def passing_template(passing_templates) -> ParsedJson:
-        yield from passing_templates
+    @pytest.fixture(params=passing_templates())
+    def passing_template(request) -> ParsedJson:
+        yield request.param
+
+
+    @staticmethod
+    def should_not_fail_when_resource_does_not_have_tags():
+        resource_without_tags = TestUtils.parsed_template(
+            RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
+        template = Template(resource_without_tags.filename, resource_without_tags.jsondoc)
+        expected_tags = ["expectedTag"]
+        config = {tags_rule.EXPECTED_TAGS_FIELD_NAME: expected_tags}
+        rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
+                                      ignore_rules=[],
+                                      include_experimental=False,
+                                      include_rules=[],
+                                      configure_rules={tags_rule.SAMPLE_TEMPLATE_RULE_ID: config}
+                                      )
+        results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
+                                         template=template.template)
+        failure_ids = list(map(lambda result: result.rule.id , results))
+        assert_that(failure_ids).contains(tags_rule.SAMPLE_TEMPLATE_RULE_ID)
 
     @staticmethod
     def should_report_missing_tag_as_specified_in_config(failing_template: ParsedJson):
@@ -80,5 +98,5 @@ class TagsRuleTest:
                                       )
         results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
                                          template=template.template)
-        failures = list(filter(lambda result: result.rule.id == tags_rule.SAMPLE_TEMPLATE_RULE_ID, results))
+        failures = results #list(filter(lambda result: result.rule.id == tags_rule.SAMPLE_TEMPLATE_RULE_ID, results))
         assert_that(failures).is_empty().described_as(template.filename)
