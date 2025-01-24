@@ -12,7 +12,7 @@
 poetry-update: .venv
 	. .venv/bin/activate && poetry update && deactivate
 
-poetry-export: .venv
+build: .venv test
 	rm -rf dist
 	. .venv/bin/activate && poetry build && deactivate
 	. .venv/bin/activate && poetry export -f requirements.txt --output requirements.txt && deactivate
