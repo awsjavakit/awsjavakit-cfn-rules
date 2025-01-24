@@ -24,8 +24,8 @@ EMPTY_DICT = {}
 class TagsRule(CloudFormationLintRule):
 
     id: str = SAMPLE_TEMPLATE_RULE_ID
-    shortdesc: str = "Missing Tags Rule for Lambdas"
-    description: str = "A rule for checking that all lambdas have the required tags"
+    shortdesc: str = "Missing Tags Rule for Resources"
+    description: str = "A rule for checking that all resources have the required tags"
     tags = ["tags"]
     experimental = False
 
