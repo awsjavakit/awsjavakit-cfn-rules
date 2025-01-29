@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Iterable, List
+from typing import Iterable, List
 
 from attrs import define
 from cfnlint.rules import CloudFormationLintRule, RuleMatch
 from cfnlint.template.template import Template
+
+from awsjavakit_cfn_rules.utils.invalid_config_exception import InvalidConfigException
 
 EXPECTED_TAGS_FIELD_NAME = "expected_tags"
 
@@ -40,48 +42,9 @@ class TagsChecker(CloudFormationLintRule):
     def match(self, cfn: Template) -> List[RuleMatch]:
 
         tags_rule_config = TagsRuleConfig(self.config)
-        resources = cfn.get_resources()
-        resource_names = resources.keys()
-        taggable_resources = filter(lambda resource_name: self._is_taggable_resource_(resources.get(resource_name)),
-                                    resource_names)
-        matches = list(map(lambda resource_name: self._check_for_missing_tags_(cfn, resource_name, tags_rule_config),
-                           taggable_resources))
-
+        tag_rules: List[TagRule] = tags_rule_config.tag_rules()
+        matches = list(map(lambda tag_rule: tag_rule.validate_template(cfn), tag_rules))
         return self._flatten_(matches)
-
-    def _check_for_missing_tags_(self, cfn: Template, resource_name: str, tags_rule_config: TagsRuleConfig) \
-            -> List[RuleMatch]:
-        matches = []
-        resource = cfn.get_resources().get(resource_name)
-        missing_tags = self._calculate_missing_tags_(self._extract_tags_(resource), tags_rule_config)
-        if self._is_not_empty_(missing_tags):
-            matches.append(RuleMatch(path=["Resources", resource],
-                                     message=self._construct_message_(missing_tags, resource_name,
-                                                                      self._type_of_(resource))))
-        return matches
-
-    def _type_of_(self, resource):
-        return resource.get("Type")
-
-    def _is_taggable_resource_(self, resource: dict) -> bool:
-        return self._type_of_(resource) not in NON_TAGGABLE_RESOURCES
-
-    def _extract_tags_(self, value) -> List[str]:
-        tag_entries = self._extract_tags_as_non_none(value)
-        tag_names = list(map(lambda tagEntry: tagEntry.get("Key"), tag_entries))
-        return tag_names
-
-    def _extract_tags_as_non_none(self, value):
-        return value.get("Properties", {}).get("Tags", [])
-
-    def _calculate_missing_tags_(self, tags: List[str], tags_rule_config: TagsRuleConfig) -> List[str]:
-        return list(filter(lambda expected: (expected not in tags), tags_rule_config.expected_tags()))
-
-    def _is_not_empty_(self, tags: List[str]) -> bool:
-        return not (tags is None or tags == [])
-
-    def _construct_message_(self, missing_tags, resource_name: str, resource_type: str) -> str:
-        return f"Resource {resource_name}:{resource_type} is missing required tags:{str(missing_tags)}"
 
     def _flatten_(self, matches: Iterable[List[RuntimeError]]) -> List[RuleMatch]:
         output = []
@@ -92,10 +55,21 @@ class TagsChecker(CloudFormationLintRule):
 
 @define
 class TagsRuleConfig:
-    cfnlint_config: dict[str, Any]
+    cfnlint_config: dict[str, dict]
 
-    def expected_tags(self):
-        return self.cfnlint_config.get(EXPECTED_TAGS_FIELD_NAME)
+    def tag_rules(self) -> List[TagRule]:
+        tags: dict[str, List[str]] = self._extract_tag_config_as_dict()
+        return [TagRule(expected_tag=expected_tag,
+                        excluded_resource_types=tags.get(expected_tag))
+                for expected_tag in tags.keys()]
+
+    def _extract_tag_config_as_dict(self):
+        config = self.cfnlint_config.get(EXPECTED_TAGS_FIELD_NAME)
+        if isinstance(config, dict):
+            return config
+        if isinstance(config, list):
+            return {tag: [] for tag in config}
+        raise InvalidConfigException("config is not correct")
 
 
 @define
@@ -107,7 +81,7 @@ class TagRule:
 
         resources = cfn.get_resources()
         resource_keys = resources.keys()
-        taggable_resources = filter(lambda key: self._is_taggable_resource_(resources.get(key)), resource_keys)
+        taggable_resources = list(filter(lambda key: self._is_taggable_resource_(resources.get(key)), resource_keys))
         not_excluded_for_this_tag_rule = list(
             filter(lambda key: self._is_not_excluded_(resources.get(key)), taggable_resources)
         )
@@ -133,7 +107,8 @@ class TagRule:
         return None
 
     def _extract_resource_tags(self, resource: dict) -> List[str]:
-        return resource.get("Properties", {}).get("Tags", [])
+        tags: List[dict] = resource.get("Properties", {}).get("Tags", [])
+        return [tag.get('Key') for tag in tags if tag is not None]
 
 
 @define
