@@ -21,6 +21,7 @@ NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
                           "AWS::CloudWatch::Dashboard",
                           "AWS::Events::Rule",
                           "AWS::Lambda::EventInvokeConfig", #sam does not add the tags in the event invoke configs
+                          "AWS::Lambda::EventSourceMapping"
                           "AWS::Scheduler::Schedule",
                           "AWS::SNS::Subscription",
                           "AWS::SQS::QueuePolicy"
