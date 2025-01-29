@@ -11,7 +11,8 @@ from faker import Faker
 from faker.providers import lorem
 from hamcrest import any_of, contains_string
 
-from awsjavakit_cfn_rules.rules import RULES_FOLDER, tags_rule
+from awsjavakit_cfn_rules.rules import RULES_FOLDER, tags_checker
+from awsjavakit_cfn_rules.rules.tags_checker import TagRule
 from tests import RESOURCES
 from tests.test_utils import ParsedJson, TestUtils
 
@@ -54,32 +55,32 @@ class TagsRuleTest:
             RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
         template = Template(resource_without_tags.filename, resource_without_tags.jsondoc)
         expected_tags = ["expectedTag"]
-        config = {tags_rule.EXPECTED_TAGS_FIELD_NAME: expected_tags}
+        config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
         rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
                                       ignore_rules=[],
                                       include_experimental=False,
                                       include_rules=[],
-                                      configure_rules={tags_rule.SAMPLE_TEMPLATE_RULE_ID: config}
+                                      configure_rules={tags_checker.SAMPLE_TEMPLATE_RULE_ID: config}
                                       )
         results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
                                          template=template.template)
         failure_ids = list(map(lambda result: result.rule.id , results))
-        assert_that(failure_ids).contains(tags_rule.SAMPLE_TEMPLATE_RULE_ID)
+        assert_that(failure_ids).contains(tags_checker.SAMPLE_TEMPLATE_RULE_ID)
 
     @staticmethod
     def should_report_missing_tag_as_specified_in_config(failing_template: ParsedJson):
         template = Template(failing_template.filename, failing_template.jsondoc)
         expected_tags = [fake.word(), fake.word()]
-        config = {tags_rule.EXPECTED_TAGS_FIELD_NAME: expected_tags}
+        config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
         rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
                                       ignore_rules=[],
                                       include_experimental=False,
                                       include_rules=[],
-                                      configure_rules={tags_rule.SAMPLE_TEMPLATE_RULE_ID: config}
+                                      configure_rules={tags_checker.SAMPLE_TEMPLATE_RULE_ID: config}
                                       )
         results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
                                          template=template.template)
-        failure = list(filter(lambda result: result.rule.id == tags_rule.SAMPLE_TEMPLATE_RULE_ID, results))[0]
+        failure = list(filter(lambda result: result.rule.id == tags_checker.SAMPLE_TEMPLATE_RULE_ID, results))[0]
         hamcrest.assert_that(failure.message, any_of(
             contains_string(expected_tags[0]),
             contains_string(expected_tags[1])
@@ -89,12 +90,12 @@ class TagsRuleTest:
     def should_pass_when_required_tags_are_in_place(passing_template: ParsedJson):
         template = Template(passing_template.filename, passing_template.jsondoc)
         expected_tags = ["expectedTag"]
-        config = {tags_rule.EXPECTED_TAGS_FIELD_NAME: expected_tags}
+        config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
         rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
                                       ignore_rules=[],
                                       include_experimental=False,
                                       include_rules=[],
-                                      configure_rules={tags_rule.SAMPLE_TEMPLATE_RULE_ID: config}
+                                      configure_rules={tags_checker.SAMPLE_TEMPLATE_RULE_ID: config}
                                       )
         results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
                                          template=template.template)
@@ -107,14 +108,32 @@ class TagsRuleTest:
             RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
         template = Template(failing_template.filename, failing_template.jsondoc)
         expected_tags = ["expectedTag"]
-        config = {tags_rule.EXPECTED_TAGS_FIELD_NAME: expected_tags}
+        config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
         rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
                                       ignore_rules=[],
                                       include_experimental=False,
                                       include_rules=[],
-                                      configure_rules={tags_rule.SAMPLE_TEMPLATE_RULE_ID: config}
+                                      configure_rules={tags_checker.SAMPLE_TEMPLATE_RULE_ID: config}
                                       )
         results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
                                          template=template.template)
         for failure in results:
             assert_that(failure.message).contains("UntaggedFunction").contains("AWS::Lambda::Function")
+
+    @staticmethod
+    def should_fail_when_resource_is_not_excluded_from_tagging():
+        failing_template=TestUtils.parsed_template(
+            RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
+        template = Template(failing_template.filename,failing_template.jsondoc)
+        tag_rule = TagRule(expected_tag="expectedTag",excluded_resource_types=[])
+        failures = tag_rule.validate_template(template)
+        assert_that(failures).is_not_empty()
+
+    @staticmethod
+    def should__not_fail_when_resource_is__excluded_from_tagging():
+        failing_template = TestUtils.parsed_template(
+            RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
+        template = Template(failing_template.filename, failing_template.jsondoc)
+        tag_rule = TagRule(expected_tag="expectedTag", excluded_resource_types=["AWS::Lambda::Function"])
+        failures = tag_rule.validate_template(template)
+        assert_that(failures).is_empty()

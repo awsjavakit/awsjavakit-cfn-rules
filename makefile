@@ -17,8 +17,8 @@ build: .venv test
 	. .venv/bin/activate && poetry build && deactivate
 	. .venv/bin/activate && poetry export -f requirements.txt --output requirements.txt && deactivate
 
-local-install: poetry-export
-	. .venv/bin/activate && python -m pip install --force-reinstall dist/awsjavakit_cfn_rules-0.0.9-py3-none-any.whl && deactivate
+local-install: .venv build
+	. .venv/bin/activate && python -m pip install --force-reinstall dist/awsjavakit_cfn_rules-0.0.13-py3-none-any.whl && deactivate
 
 test: .venv
 	. .venv/bin/activate && poetry run pytest && deactivate
