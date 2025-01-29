@@ -11,7 +11,7 @@ from awsjavakit_cfn_rules.utils.invalid_config_exception import InvalidConfigExc
 EXPECTED_TAGS_FIELD_NAME = "expected_tags"
 
 CONFIG_DEFINITION = {
-    EXPECTED_TAGS_FIELD_NAME: {"default": [], "type": "list", "itemtype": "string"}
+    EXPECTED_TAGS_FIELD_NAME: {"default": {}, "type": "list", "itemtype": "string"}
 }
 
 NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
@@ -19,7 +19,11 @@ NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
                           "AWS::IAM::ManagedPolicy",
                           "AWS::CloudFormation::Stack",
                           "AWS::CloudWatch::Dashboard",
-                          "AWS::Events::Rule"
+                          "AWS::Events::Rule",
+                          "AWS::Lambda::EventInvokeConfig", #sam does not add the tags in the event invoke configs
+                          "AWS::Scheduler::Schedule",
+                          "AWS::SNS::Subscription",
+                          "AWS::SQS::QueuePolicy"
                           }
 SAMPLE_TEMPLATE_RULE_ID = "E9001"
 
@@ -118,7 +122,7 @@ class CheckResult:
     missing_tag: str
 
     def as_rule_match(self) -> RuleMatch:
-        return RuleMatch(path=["Resources", self.resource],
+        return RuleMatch(path=["Resources", self.resource_name],
                          message=self._construct_message_())
 
     def _construct_message_(self) -> str:
