@@ -11,7 +11,7 @@ jobs:
   build:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-22.04
-    environment: testpypi
+    environment: pypi
     permissions:
       id-token: write
     steps:
