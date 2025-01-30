@@ -16,6 +16,7 @@ CONFIG_DEFINITION = {
 }
 
 NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
+                          "AWS::IAM::Role",
                           "AWS::IAM::ManagedPolicy",
                           "AWS::CloudFormation::Stack",
                           "AWS::CloudWatch::Dashboard",
