@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "awsjavakit-cfn-rules"
-version = "0.0.16"
-description = "My CFN rules"
+version = "0.0.17"
+description = "Extendable CFN rules"
 authors = ["Orestis Gkorgkas <orestis.gorgas@gmail.com>"]
 readme = "README.md"
 packages = [
