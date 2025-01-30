@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Iterable, List
 
 from attrs import define
+from cfnlint import ConfigMixIn
 from cfnlint.rules import CloudFormationLintRule, RuleMatch
 from cfnlint.template.template import Template
 
@@ -15,13 +16,12 @@ CONFIG_DEFINITION = {
 }
 
 NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
-                          "AWS::IAM::Role",
                           "AWS::IAM::ManagedPolicy",
                           "AWS::CloudFormation::Stack",
                           "AWS::CloudWatch::Dashboard",
                           "AWS::Events::Rule",
                           "AWS::Lambda::EventInvokeConfig",
-                          "AWS::Lambda::EventSourceMapping", #sam does not add the tags in the event invoke configs
+                          "AWS::Lambda::EventSourceMapping",  # sam does not add the tags in the event invoke configs
                           "AWS::Scheduler::Schedule",
                           "AWS::SNS::Subscription",
                           "AWS::SQS::QueuePolicy"
@@ -60,21 +60,21 @@ class TagsChecker(CloudFormationLintRule):
 
 @define
 class TagsRuleConfig:
-    cfnlint_config: dict[str, dict]
+    rule_config: list[str]
 
     def tag_rules(self) -> List[TagRule]:
-        tags: dict[str, List[str]] = self._extract_tag_config_as_dict()
-        return [TagRule(expected_tag=expected_tag,
-                        excluded_resource_types=tags.get(expected_tag))
-                for expected_tag in tags.keys()]
+        tags: List[str] = self._extract_tag_config_as_dict()
+        return [TagRule(expected_tag=expected_tag, excluded_resource_types=[])
+                for expected_tag in tags]
 
     def _extract_tag_config_as_dict(self):
-        config = self.cfnlint_config.get(EXPECTED_TAGS_FIELD_NAME)
-        if isinstance(config, dict):
-            return config
+        config = self.rule_config.get(EXPECTED_TAGS_FIELD_NAME)
         if isinstance(config, list):
-            return {tag: [] for tag in config}
+            return config
         raise InvalidConfigException("config is not correct")
+
+    def as_cfn_config(self) -> ConfigMixIn:
+        return ConfigMixIn(cli_args=None, **{EXPECTED_TAGS_FIELD_NAME: self.rule_config})
 
 
 @define

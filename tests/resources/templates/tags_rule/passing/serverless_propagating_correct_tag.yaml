@@ -4,15 +4,6 @@ Transform:
 
 Resources:
 
-  TaggedFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: .
-      Runtime: python3.10
-      Handler: main.handler
-      Tags:
-        someKey: someValue
-
   TaggedFunctionGeneratingMoreResources:
     Type: AWS::Serverless::Function
     Properties:
@@ -21,8 +12,9 @@ Resources:
       Handler: main.handler
       Policies:
         - !Ref SomePolicy
+      PropagateTags: true
       Tags:
-        someKey: someValue
+        expectedTag: someValue
 
 
   SomePolicy:

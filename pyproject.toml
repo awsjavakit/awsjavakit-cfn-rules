@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "awsjavakit-cfn-rules"
-version = "0.0.15"
+version = "0.0.16"
 description = "My CFN rules"
 authors = ["Orestis Gkorgkas <orestis.gorgas@gmail.com>"]
 readme = "README.md"
@@ -12,7 +12,7 @@ package-mode = true
 
 [tool.poetry.dependencies]
 python = "^3.10.15"
-cfn-lint = "^1.21.0"
+cfn-lint = "^1.23.0"
 attrs = "24.2.0"
 flake8 = '7.1.1'
 

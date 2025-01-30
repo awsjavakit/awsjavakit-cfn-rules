@@ -9,6 +9,8 @@ Resources:
       CodeUri: .
       Runtime: python3.10
       Handler: main.handler
+      Policies:
+        - !Ref ManagedPolicy
       Tags:
         expectedTag: theFunction
 #
