@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable, List
+from typing import Any, Iterable, List
 
 from attrs import define
 from cfnlint import ConfigMixIn
@@ -27,14 +27,15 @@ NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
                           "AWS::SNS::Subscription",
                           "AWS::SQS::QueuePolicy"
                           }
-SAMPLE_TEMPLATE_RULE_ID = "E9001"
+TAGS_RULE_ID = "E9001"
 
 EMPTY_DICT = {}
+EMPTY_CONFIG = []
 
 
 class TagsChecker(CloudFormationLintRule):
 
-    id: str = SAMPLE_TEMPLATE_RULE_ID
+    id: str = TAGS_RULE_ID
     shortdesc: str = "Missing Tags Rule for Resources"
     description: str = "A rule for checking that all resources have the required tags"
     tags = ["tags"]
@@ -61,7 +62,7 @@ class TagsChecker(CloudFormationLintRule):
 
 @define
 class TagsRuleConfig:
-    rule_config: list[str]
+    rule_config: dict[str, list[str]]
 
     def tag_rules(self) -> List[TagRule]:
         tags: List[str] = self._extract_tag_config_as_dict()
@@ -70,9 +71,17 @@ class TagsRuleConfig:
 
     def _extract_tag_config_as_dict(self):
         config = self.rule_config.get(EXPECTED_TAGS_FIELD_NAME)
-        if isinstance(config, list):
+        if self._is_valid_format_(config):
             return config
+        if self._is_empty_(config):
+            return EMPTY_CONFIG
         raise InvalidConfigException("config is not correct")
+
+    def _is_empty_(self, config:Any) -> bool:
+        return isinstance(config, dict) and not config
+
+    def _is_valid_format_(self, config:Any) -> bool:
+        return isinstance(config, list)
 
     def as_cfn_config(self) -> ConfigMixIn:
         return ConfigMixIn(cli_args=None, **{EXPECTED_TAGS_FIELD_NAME: self.rule_config})
