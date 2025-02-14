@@ -22,6 +22,8 @@ local-install: .venv build
 
 test: .venv
 	. .venv/bin/activate && poetry run pytest && deactivate
+	. .venv/bin/activate && isort . && deactivate
+	. .venv/bin/activate && ruff check . && deactivate
 	. .venv/bin/activate && pylint src && deactivate
 	. .venv/bin/activate && pylint tests && deactivate
 

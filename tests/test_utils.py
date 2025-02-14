@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List
 
 import cfnlint
 import cfnlint.decode.cfn_yaml
@@ -15,7 +14,7 @@ class ParsedJson:
 class TestUtils:
 
     @staticmethod
-    def get_templates(folder: Path) -> List[Path]:
+    def get_templates(folder: Path) -> list[Path]:
         template_filenames = list(filter(lambda file: file.is_file(), folder.iterdir()))
         full_paths = map(lambda filename: folder.with_segments(filename).absolute(), template_filenames)
         return list(full_paths)
