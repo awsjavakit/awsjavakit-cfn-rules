@@ -31,8 +31,7 @@ class TagsRuleTest:
         results = TagsRuleTest._run_template_(expected_tags, resource_without_tags)
 
         failure_ids = list(map(lambda result: result.rule.id, results))
-        assert_that(failure_ids).contains(tags_checker.SAMPLE_TEMPLATE_RULE_ID)
-
+        assert_that(failure_ids).contains(tags_checker.TAGS_RULE_ID)
 
     @staticmethod
     def should_report_missing_tag_as_specified_in_config(failing_template: ParsedJson):
@@ -43,11 +42,11 @@ class TagsRuleTest:
                                       ignore_rules=[],
                                       include_experimental=False,
                                       include_rules=[],
-                                      configure_rules={tags_checker.SAMPLE_TEMPLATE_RULE_ID: config}
+                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
                                       )
         results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
                                          template=template.template)
-        failure = list(filter(lambda result: result.rule.id == tags_checker.SAMPLE_TEMPLATE_RULE_ID, results))[0]
+        failure = list(filter(lambda result: result.rule.id == tags_checker.TAGS_RULE_ID, results))[0]
         hamcrest.assert_that(failure.message, any_of(
             contains_string(expected_tags[0]),
             contains_string(expected_tags[1])
@@ -62,7 +61,7 @@ class TagsRuleTest:
                                       ignore_rules=[],
                                       include_experimental=False,
                                       include_rules=[],
-                                      configure_rules={tags_checker.SAMPLE_TEMPLATE_RULE_ID: config}
+                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
                                       )
         results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
                                          template=template.template)
@@ -80,7 +79,7 @@ class TagsRuleTest:
                                       ignore_rules=[],
                                       include_experimental=False,
                                       include_rules=[],
-                                      configure_rules={tags_checker.SAMPLE_TEMPLATE_RULE_ID: config}
+                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
                                       )
         results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
                                          template=template.template)
@@ -93,9 +92,15 @@ class TagsRuleTest:
             RESOURCES / "templates" / "tags_rule" / "passing" / "serverless_propagating_correct_tag.yaml")
 
         expected_tags = ["expectedTag"]
-        results=TagsRuleTest._run_template_(expected_tags,failing_template)
+        results = TagsRuleTest._run_template_(expected_tags, failing_template)
         assert_that(results).is_empty()
 
+    @staticmethod
+    def should_accept_empty_config():
+        failing_template = TestUtils.parsed_template(
+            RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
+        results = TagsRuleTest._run_template_([], failing_template)
+        assert_that(results).is_empty()
 
     @staticmethod
     def failing_templates() -> List[ParsedJson]:
@@ -121,16 +126,16 @@ class TagsRuleTest:
     def passing_template(request) -> ParsedJson:
         yield request.param
 
-
     @staticmethod
     def _run_template_(expected_tags: List[str], resource: ParsedJson):
-        config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
+        config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags} if len(expected_tags) > 0 else {}
+
         mix_in = ConfigMixIn(cli_args=None, **config)
         rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
                                       ignore_rules=[],
                                       include_experimental=False,
                                       include_rules=[],
-                                      configure_rules={tags_checker.SAMPLE_TEMPLATE_RULE_ID: config}
+                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
                                       )
         runner = TemplateRunner(resource.filename, resource.jsondoc, mix_in, rules)
         return list(runner.run())

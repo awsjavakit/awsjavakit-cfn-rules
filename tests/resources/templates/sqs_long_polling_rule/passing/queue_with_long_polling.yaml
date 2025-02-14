@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  DlqArn:
+    Type: String
+
+Resources:
+
+  SomeQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub SomeQueue-${AWS::StackName}
+      ReceiveMessageWaitTimeSeconds: 5
+      RedrivePolicy:
+        !Ref DlqArn
+      VisibilityTimeout: 900
