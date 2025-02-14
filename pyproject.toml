@@ -22,7 +22,7 @@ assertpy = "1.1"
 PyYAML = '6.0.2'
 Faker = "33.3.1"
 PyHamcrest = "2.1.0"
-pylint = "3.3.3"
+pylint = "3.3.4"
 ruff = "0.9.6"
 isort = "6.0.0"
 
