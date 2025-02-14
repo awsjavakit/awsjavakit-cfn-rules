@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import List
-
 import hamcrest
 import pytest
 from assertpy import assert_that
-from cfnlint import ConfigMixIn, Template, core as cfnlintcore
+from cfnlint import ConfigMixIn, Template
+from cfnlint import core as cfnlintcore
 from cfnlint.runner import TemplateRunner
 from faker import Faker
 from faker.providers import lorem
@@ -103,14 +102,14 @@ class TagsRuleTest:
         assert_that(results).is_empty()
 
     @staticmethod
-    def failing_templates() -> List[ParsedJson]:
+    def failing_templates() -> list[ParsedJson]:
         templates_folder = (RESOURCES / "templates" / "tags_rule" / "failing").absolute()
         template_files = TestUtils.get_templates(templates_folder)
         parsed_jsons = map(TestUtils.parsed_template, template_files)
         return list(parsed_jsons)
 
     @staticmethod
-    def passing_templates() -> List[ParsedJson]:
+    def passing_templates() -> list[ParsedJson]:
         templates_folder = (RESOURCES / "templates" / "tags_rule" / "passing").absolute()
         template_files = TestUtils.get_templates(templates_folder)
         parsed_jsons = map(TestUtils.parsed_template, template_files)
@@ -127,7 +126,7 @@ class TagsRuleTest:
         yield request.param
 
     @staticmethod
-    def _run_template_(expected_tags: List[str], resource: ParsedJson):
+    def _run_template_(expected_tags: list[str], resource: ParsedJson):
         config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags} if len(expected_tags) > 0 else {}
 
         mix_in = ConfigMixIn(cli_args=None, **config)

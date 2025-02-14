@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Iterable, List
+from collections.abc import Iterable
+from typing import Any
 
 from attrs import define
 from cfnlint import ConfigMixIn
@@ -46,14 +47,14 @@ class TagsChecker(CloudFormationLintRule):
         self.config_definition = CONFIG_DEFINITION
         self.configure()
 
-    def match(self, cfn: Template) -> List[RuleMatch]:
+    def match(self, cfn: Template) -> list[RuleMatch]:
 
         tags_rule_config = TagsRuleConfig(self.config)
-        tag_rules: List[TagRule] = tags_rule_config.tag_rules()
+        tag_rules: list[TagRule] = tags_rule_config.tag_rules()
         matches = list(map(lambda tag_rule: tag_rule.validate_template(cfn), tag_rules))
         return self._flatten_(matches)
 
-    def _flatten_(self, matches: Iterable[List[RuntimeError]]) -> List[RuleMatch]:
+    def _flatten_(self, matches: Iterable[list[RuntimeError]]) -> list[RuleMatch]:
         output = []
         for match in matches:
             output += match
@@ -64,8 +65,8 @@ class TagsChecker(CloudFormationLintRule):
 class TagsRuleConfig:
     rule_config: dict[str, list[str]]
 
-    def tag_rules(self) -> List[TagRule]:
-        tags: List[str] = self._extract_tag_config_as_dict()
+    def tag_rules(self) -> list[TagRule]:
+        tags: list[str] = self._extract_tag_config_as_dict()
         return [TagRule(expected_tag=expected_tag, excluded_resource_types=[])
                 for expected_tag in tags]
 
@@ -89,10 +90,10 @@ class TagsRuleConfig:
 
 @define
 class TagRule:
-    excluded_resource_types: List[str]
+    excluded_resource_types: list[str]
     expected_tag: str
 
-    def validate_template(self, cfn: Template) -> List[RuleMatch]:
+    def validate_template(self, cfn: Template) -> list[RuleMatch]:
 
         resources = cfn.get_resources()
         resource_keys = resources.keys()
@@ -121,8 +122,8 @@ class TagRule:
             return CheckResult(resource=resource, missing_tag=self.expected_tag, resource_name=resource_name)
         return None
 
-    def _extract_resource_tags(self, resource: dict) -> List[str]:
-        tags: List[dict] = resource.get("Properties", {}).get("Tags", [])
+    def _extract_resource_tags(self, resource: dict) -> list[str]:
+        tags: list[dict] = resource.get("Properties", {}).get("Tags", [])
         return [tag.get('Key') for tag in tags if tag is not None]
 
 

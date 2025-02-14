@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import numbers
-from typing import List
 
 from cfnlint.rules import CloudFormationLintRule, RuleMatch
 from cfnlint.template.template import Template
@@ -23,13 +22,13 @@ class SqsLongPollingRule(CloudFormationLintRule):
         super().__init__()
         self.configure()
 
-    def match(self, cfn: Template) -> List[RuleMatch]:
+    def match(self, cfn: Template) -> list[RuleMatch]:
         queue_names_with_short_polling = SqsLongPollingRule._list_queues_with_short_polling_(cfn)
         matches = list(map(SqsLongPollingRule._construct_match_, queue_names_with_short_polling))
         return matches
 
     @staticmethod
-    def _list_queues_with_short_polling_(cfn: Template) -> List[str]:
+    def _list_queues_with_short_polling_(cfn: Template) -> list[str]:
         queues = cfn.get_resources("AWS::SQS::Queue")
         return list(
             filter(lambda queue_name: SqsLongPollingRule._is_short_polling_(queues.get(queue_name)),queues.keys())

@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import List
-
 import pytest
 from assertpy import assert_that
-from cfnlint import ConfigMixIn, core as cfnlintcore
+from cfnlint import ConfigMixIn
+from cfnlint import core as cfnlintcore
 from cfnlint.runner import TemplateRunner
 
 from awsjavakit_cfn_rules.rules import RULES_FOLDER, tags_checker
@@ -48,7 +47,7 @@ class SqsLongPollingRuleTest:
         return list(runner.run())
 
     @staticmethod
-    def failing_templates() -> List[ParsedJson]:
+    def failing_templates() -> list[ParsedJson]:
         templates_folder = (TEMPLATES / "sqs_long_polling_rule" / "failing").absolute()
         template_files = TestUtils.get_templates(templates_folder)
         parsed_jsons = map(TestUtils.parsed_template, template_files)
