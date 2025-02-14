@@ -3,7 +3,11 @@ templates:
 append_rules:
   - awsjavakit_cfn_rules
 
-
+configure_rules:
+    E9001:
+        expected_tags:
+            - expected_tag1
+            - expected_tag2
 
 
 
