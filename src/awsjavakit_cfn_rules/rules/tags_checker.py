@@ -27,7 +27,8 @@ NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
                           "AWS::Scheduler::Schedule",
                           "AWS::SNS::Subscription",
                           "AWS::SQS::QueuePolicy",
-                          "AWS::Budgets::Budget"
+                          "AWS::Budgets::Budget",
+                          "AWS::SNS::TopicInlinePolicy"
                           }
 TAGS_RULE_ID = "E9001"
 
