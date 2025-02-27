@@ -80,10 +80,10 @@ class TagsRuleConfig:
             return EMPTY_CONFIG
         raise InvalidConfigException("config is not correct")
 
-    def _is_empty_(self, config:Any) -> bool:
+    def _is_empty_(self, config: Any) -> bool:
         return isinstance(config, dict) and not config
 
-    def _is_valid_format_(self, config:Any) -> bool:
+    def _is_valid_format_(self, config: Any) -> bool:
         return isinstance(config, list)
 
     def as_cfn_config(self) -> ConfigMixIn:
@@ -125,8 +125,13 @@ class TagRule:
         return None
 
     def _extract_resource_tags(self, resource: dict) -> list[str]:
-        tags: list[dict] = resource.get("Properties", {}).get("Tags", [])
-        return [tag.get('Key') for tag in tags if tag is not None]
+        tags: Any = resource.get("Properties", {}).get("Tags")
+        if isinstance(tags, list):
+            return [tag.get('Key') for tag in tags if tag is not None]
+        if isinstance(tags, dict):
+            tags_as_dict: dict = tags
+            return list(tags_as_dict.keys())
+        return []
 
 
 @define

@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Resources:
+
+  SsmParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      DataType: text
+      Description: Some Temporary Parameter
+      Name: TemporaryParameter
+      Type: String
+      Value: TheParameterValue
+      Tags:
+        expectedTag: someValue
