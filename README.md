@@ -17,7 +17,10 @@ configure_rules:
             - expectedTag
 ```
 
-
+### E9002 SQS Long polling rule:
+It checks whether an SQS queue has been configured to perform long polling to avoid invoking targets with empty responses.
+See https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html
+ 
 ### Suggested Usage:
 
 Create a configuration file `.cfnlintrc` like the following:
