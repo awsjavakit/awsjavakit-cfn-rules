@@ -8,7 +8,7 @@ from cfnlint import ConfigMixIn
 from cfnlint import core as cfnlintcore
 from cfnlint.runner import TemplateRunner
 
-from awsjavakit_cfn_rules.rules import RULES_FOLDER, tags_checker
+from awsjavakit_cfn_rules.rules import RULES_FOLDER
 from awsjavakit_cfn_rules.rules.sqs_long_polling_rule import ERROR_MESSAGE
 from tests import TEMPLATES
 from tests.test_utils import ParsedJson, TestUtils
@@ -42,7 +42,7 @@ class SqsLongPollingRuleTest:
         rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
                                       ignore_rules=[],
                                       include_experimental=False,
-                                      include_rules=[tags_checker.TAGS_RULE_ID],
+                                      include_rules=[],
                                       configure_rules={}
                                       )
         runner = TemplateRunner(resource.filename, resource.jsondoc, mix_in, rules) # type: ignore 
