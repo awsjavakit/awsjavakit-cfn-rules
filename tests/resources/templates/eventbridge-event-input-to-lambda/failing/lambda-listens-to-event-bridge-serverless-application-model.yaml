@@ -26,7 +26,28 @@ Resources:
                   - terminated
             RetryPolicy:
               MaximumRetryAttempts: 5
-              MaximumEventAgeInSeconds: 900 
+              MaximumEventAgeInSeconds: 900
             Target:
               Id: MyTarget
 
+  SomeOtherFunctionListeningToEventBridge:
+    Type: AWS::Serverless::Function
+    Properties:
+      Architectures: [ 'arm64' ]
+      CodeUri: .
+      Handler: some_package.handle_request
+      Runtime: python3.10
+      Events:
+        EventBridge:
+          Type: EventBridgeRule
+          Properties:
+            Input: '{"Key": "Value"}'
+            Pattern:
+              detail:
+                state:
+                  - terminated
+            RetryPolicy:
+              MaximumRetryAttempts: 5
+              MaximumEventAgeInSeconds: 900
+            Target:
+              Id: MyOtherTarget
