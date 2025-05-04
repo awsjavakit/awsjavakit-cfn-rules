@@ -25,6 +25,7 @@ PyHamcrest = "2.1.0"
 pylint = "3.3.4"
 ruff = "0.9.6"
 isort = "6.0.0"
+pyright = "1.1.400"
 
 [build-system]
 requires = ["poetry-core"]
@@ -70,3 +71,11 @@ select = [
 max-line-length = 120
 disable = ["missing-module-docstring", "missing-class-docstring", "missing-function-docstring"]
 
+[tool.pyright]
+include = ['src']
+venv = ".venv"
+venvPath = "."
+executionEnvironments = [
+      { root = "src", pythonVersion = "3.10", reportMissingImports = "error" },
+]
+ strictParameterNoneValue=false

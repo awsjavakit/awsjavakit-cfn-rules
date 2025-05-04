@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 import cfnlint
 import cfnlint.decode.cfn_yaml
@@ -8,7 +9,7 @@ from attrs import define
 @define
 class ParsedJson:
     filename: str
-    jsondoc: dict
+    jsondoc: dict[str,Any]
 
 
 class TestUtils:

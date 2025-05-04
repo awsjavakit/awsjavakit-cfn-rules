@@ -5,14 +5,14 @@ import numbers
 from cfnlint.rules import CloudFormationLintRule, RuleMatch
 from cfnlint.template.template import Template
 
-TAGS_RULE_ID = "E9002"
-LONG_POLLING_PROPERTY = "ReceiveMessageWaitTimeSeconds"
-ERROR_MESSAGE = f"Queue should enable long polling by setting  {LONG_POLLING_PROPERTY} to non zero value"
+RULE_ID: str = "E9002"
+LONG_POLLING_PROPERTY :str = "ReceiveMessageWaitTimeSeconds"
+ERROR_MESSAGE :str = f"Queue should enable long polling by setting  {LONG_POLLING_PROPERTY} to non zero value"
 
 
 class SqsLongPollingRule(CloudFormationLintRule):
 
-    id: str = TAGS_RULE_ID
+    id: str = RULE_ID
     shortdesc: str = "Ensure that long polling is enabled for SQS queue to avoid costs"
     description: str = "Ensure that long polling is enabled for SQS queue to avoid costs"
     tags = ["SQS", "long polling"]
@@ -31,7 +31,7 @@ class SqsLongPollingRule(CloudFormationLintRule):
     def _list_queues_with_short_polling_(cfn: Template) -> list[str]:
         queues = cfn.get_resources("AWS::SQS::Queue")
         return list(
-            filter(lambda queue_name: SqsLongPollingRule._is_short_polling_(queues.get(queue_name)),queues.keys())
+            filter(lambda queue_name: SqsLongPollingRule._is_short_polling_(queues.get(queue_name,{})),queues.keys())
         )
 
 
