@@ -8,7 +8,11 @@ from cfnlint import ConfigMixIn
 from cfnlint.rules import CloudFormationLintRule, RuleMatch
 from cfnlint.template.template import Template
 
+from awsjavakit_cfn_rules.utils.functional import flatmap
+
 from awsjavakit_cfn_rules.utils.invalid_config_exception import InvalidConfigException
+
+EMPTY_DICT = {}
 
 EXPECTED_TAGS_FIELD_NAME = "expected_tags"
 
@@ -54,14 +58,10 @@ class TagsChecker(CloudFormationLintRule):
 
         tags_rule_config = TagsRuleConfig(self.config)
         tag_rules: list[TagRule] = tags_rule_config.tag_rules()
-        matches = list(map(lambda tag_rule: tag_rule.validate_template(cfn), tag_rules))
-        return self._flatten_(matches)
+        matches = list(flatmap(lambda tag_rule: tag_rule.validate_template(cfn), tag_rules))
+        return matches
 
-    def _flatten_(self, matches: Iterable[list[RuntimeError]]) -> list[RuleMatch]:
-        output = []
-        for match in matches:
-            output += match
-        return output
+    
 
 
 @define
@@ -73,8 +73,8 @@ class TagsRuleConfig:
         return [TagRule(expected_tag=expected_tag, excluded_resource_types=[])
                 for expected_tag in tags]
 
-    def _extract_tag_config_as_dict(self):
-        config = self.rule_config.get(EXPECTED_TAGS_FIELD_NAME)
+    def _extract_tag_config_as_dict(self)->list[str]:
+        config = self.rule_config.get(EXPECTED_TAGS_FIELD_NAME,[])
         if self._is_valid_format_(config):
             return config
         if self._is_empty_(config):
@@ -88,7 +88,7 @@ class TagsRuleConfig:
         return isinstance(config, list)
 
     def as_cfn_config(self) -> ConfigMixIn:
-        return ConfigMixIn(cli_args=None, **{EXPECTED_TAGS_FIELD_NAME: self.rule_config})
+        return ConfigMixIn(cli_args=None, **{EXPECTED_TAGS_FIELD_NAME: self.rule_config}) #type: ignore
 
 
 @define
@@ -100,27 +100,29 @@ class TagRule:
 
         resources = cfn.get_resources()
         resource_keys = resources.keys()
-        taggable_resources = list(filter(lambda key: self._is_taggable_resource_(resources.get(key)), resource_keys))
+        taggable_resources = list(filter(lambda key: self._is_taggable_resource_(resources.get(key,EMPTY_DICT)), resource_keys))
         not_excluded_for_this_tag_rule = list(
-            filter(lambda key: self._is_not_excluded_(resources.get(key)), taggable_resources)
+            filter(lambda key: self._is_not_excluded_(resources.get(key,EMPTY_DICT)), taggable_resources)
         )
 
-        check_results = map(lambda key: self._calculate_missing_tags_(resource_name=key, resource=resources.get(key)),
-                            not_excluded_for_this_tag_rule)
-        non_none_check_results = filter(lambda result: result is not None, check_results)
+        check_results:Iterable[CheckResult|None] =\
+            map(lambda key: self._calculate_missing_tags_(resource_name=key, resource=resources.get(key, EMPTY_DICT)),
+                not_excluded_for_this_tag_rule)
+        non_none_check_results: Iterable[CheckResult] =\
+            [result for result in check_results if result is not None ]
         matches = map(lambda check_result: check_result.as_rule_match(), non_none_check_results)
         return list(matches)
 
     def _is_taggable_resource_(self, resource: dict) -> bool:
         return self._type_of_(resource) not in NON_TAGGABLE_RESOURCES
 
-    def _type_of_(self, resource: dict):
+    def _type_of_(self, resource: dict[str, Any]):
         return resource.get("Type")
 
-    def _is_not_excluded_(self, resource: dict):
+    def _is_not_excluded_(self, resource: dict[str,Any]):
         return self._type_of_(resource) not in self.excluded_resource_types
 
-    def _calculate_missing_tags_(self, resource_name: str, resource: dict) -> CheckResult | None:
+    def _calculate_missing_tags_(self, resource_name: str, resource: dict[str,Any]) -> CheckResult|None:
         if self.expected_tag not in self._extract_resource_tags(resource):
             return CheckResult(resource=resource, missing_tag=self.expected_tag, resource_name=resource_name)
         return None
@@ -137,7 +139,7 @@ class TagRule:
 
 @define
 class CheckResult:
-    resource: dict
+    resource: dict[str,Any]
     resource_name: str
     missing_tag: str
 
@@ -147,6 +149,6 @@ class CheckResult:
 
     def _construct_message_(self) -> str:
         return f"Resource {self.resource_name}:{self._resource_type_()} is missing required tag:{self.missing_tag}"
-
+    
     def _resource_type_(self) -> str:
-        return self.resource.get("Type")
+        return str(self.resource.get("Type",""))

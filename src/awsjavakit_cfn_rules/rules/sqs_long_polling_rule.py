@@ -31,7 +31,7 @@ class SqsLongPollingRule(CloudFormationLintRule):
     def _list_queues_with_short_polling_(cfn: Template) -> list[str]:
         queues = cfn.get_resources("AWS::SQS::Queue")
         return list(
-            filter(lambda queue_name: SqsLongPollingRule._is_short_polling_(queues.get(queue_name)),queues.keys())
+            filter(lambda queue_name: SqsLongPollingRule._is_short_polling_(queues.get(queue_name,{})),queues.keys())
         )
 
 

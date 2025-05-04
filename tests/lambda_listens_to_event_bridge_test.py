@@ -1,13 +1,12 @@
 from pathlib import Path
-from pathlib import Path
 from typing import List
 
 from cfnlint import ConfigMixIn, core as cfnlintcore
 from cfnlint.match import Match
 from cfnlint.runner import TemplateRunner
-from hamcrest import assert_that, contains_string, equal_to, greater_than, is_
+from hamcrest import assert_that, contains_string, greater_than, is_
 
-from awsjavakit_cfn_rules.rules import RULES_FOLDER, lambda_listens_to_event_bridge
+from awsjavakit_cfn_rules.rules import RULES_FOLDER
 from tests import TEMPLATES
 from tests.test_utils import ParsedJson, TestUtils
 
