@@ -11,7 +11,7 @@ requirements.txt
 samconfig.toml
 .aws-sam
 .gitignore
-
+poetry.lock
 # Node artifact files
 node_modules/
 dist/
