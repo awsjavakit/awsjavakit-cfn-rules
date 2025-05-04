@@ -26,6 +26,7 @@ test: .venv
 	. .venv/bin/activate && ruff check . && deactivate
 	. .venv/bin/activate && pylint src && deactivate
 	. .venv/bin/activate && pylint tests && deactivate
+	. .venv/bin/activate && poetry run  pyright && deactivate
 
 clean:
 	rm -rf dist

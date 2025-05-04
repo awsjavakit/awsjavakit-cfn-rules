@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  Dlq:
+    Type: String
+
+Resources:
+
+  FunctionListeningToEventBridge:
+    Type: AWS::Serverless::Function
+    Properties:
+      Architectures: ['arm64']
+      CodeUri: .
+      Handler: some_package.handle_request
+      Runtime: python3.10
+
+  SomeEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Some description
+      EventBusName: default
+      EventPattern: Json
+      Name: SomeRule
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt FunctionListeningToEventBridge.Arn
+          Id: SomeRule
+

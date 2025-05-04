@@ -6,10 +6,12 @@ from pathlib import Path
 
 from awsjavakit_cfn_rules.rules.sqs_long_polling_rule import SqsLongPollingRule
 from awsjavakit_cfn_rules.rules.tags_checker import TagsChecker
+from awsjavakit_cfn_rules.rules.lambda_listens_to_event_bridge import LambdaListensToEventBridgeRule
 
 PROJECT_FOLDER = Path(os.path.abspath(__file__)).parent
 
 __all__ = [
     "TagsChecker",
-    "SqsLongPollingRule"
+    "SqsLongPollingRule",
+    "LambdaListensToEventBridgeRule"
 ]
