@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Iterable
+
 import pytest
 from assertpy import assert_that
 from cfnlint import ConfigMixIn
@@ -43,7 +45,7 @@ class SqsLongPollingRuleTest:
                                       include_rules=[tags_checker.TAGS_RULE_ID],
                                       configure_rules={}
                                       )
-        runner = TemplateRunner(resource.filename, resource.jsondoc, mix_in, rules)
+        runner = TemplateRunner(resource.filename, resource.jsondoc, mix_in, rules) # type: ignore 
         return list(runner.run())
 
     @staticmethod
@@ -55,5 +57,5 @@ class SqsLongPollingRuleTest:
 
     @staticmethod
     @pytest.fixture(params=failing_templates())
-    def failing_template(request) -> ParsedJson:
+    def failing_template(request) -> Iterable[ParsedJson]:
         yield request.param
