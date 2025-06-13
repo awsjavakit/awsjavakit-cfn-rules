@@ -25,12 +25,16 @@ NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
                           "AWS::Events::Rule",
                           "AWS::Lambda::EventInvokeConfig",
                           "AWS::Lambda::EventSourceMapping",  # sam does not add the tags in the event invoke configs
+                          "AWS::Lambda::Permission",
                           "AWS::Scheduler::Schedule",
                           "AWS::SNS::Subscription",
                           "AWS::SQS::QueuePolicy",
                           "AWS::Budgets::Budget",
                           "AWS::SNS::TopicInlinePolicy",
-                          "AWS::S3::BucketPolicy"
+                          "AWS::S3::BucketPolicy",
+                          "AWS::SecretsManager::RotationSchedule",
+                          "AWS::CloudFront::OriginAccessControl",
+                          "AWS::CloudFront::CachePolicy"
                           }
 TAGS_RULE_ID = "E9001"
 
