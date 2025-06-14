@@ -5,6 +5,8 @@ Transform:
 Parameters:
   Dlq:
     Type: String
+  SomeQueueArn:
+    Type: String
 
 Resources:
 
@@ -15,6 +17,12 @@ Resources:
       CodeUri: .
       Handler: some_package.handle_request
       Runtime: python3.10
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !Ref SomeQueueArn
+            Enabled: True
 
   SomeEventRule:
     Type: AWS::Events::Rule
@@ -26,5 +34,7 @@ Resources:
       State: ENABLED
       Targets:
         - Arn: "arn:aws:sqs:eu-west-1:123456789012:SomeQueue"
+          Id: SomeRule
+        - Arn: !Ref SomeQueueArn
           Id: SomeRule
 

@@ -4,9 +4,9 @@ awsjavakit_cfn_rules package
 import os
 from pathlib import Path
 
+from awsjavakit_cfn_rules.rules.lambda_listens_to_event_bridge import LambdaListensToEventBridgeRule
 from awsjavakit_cfn_rules.rules.sqs_long_polling_rule import SqsLongPollingRule
 from awsjavakit_cfn_rules.rules.tags_checker import TagsChecker
-from awsjavakit_cfn_rules.rules.lambda_listens_to_event_bridge import LambdaListensToEventBridgeRule
 
 PROJECT_FOLDER = Path(os.path.abspath(__file__)).parent
 

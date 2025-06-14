@@ -12,7 +12,7 @@ package-mode = true
 
 [tool.poetry.dependencies]
 python = "^3.10.15"
-cfn-lint = "^1.23.0"
+cfn-lint = "1.23.0"
 attrs = "24.2.0"
 
 
@@ -69,7 +69,17 @@ select = [
 [tool.pylint.format]
 # Maximum number of characters on a single line.
 max-line-length = 120
-disable = ["missing-module-docstring", "missing-class-docstring", "missing-function-docstring"]
+
+[tool.pylint.messages_control]
+disable = ["missing-final-newline",
+    "trailing-whitespace",
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "unnecessary-lambda",
+    "too-few-public-methods"]
+
+
 
 [tool.pyright]
 include = ['src']

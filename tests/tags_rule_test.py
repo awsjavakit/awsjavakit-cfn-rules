@@ -12,7 +12,7 @@ from faker import Faker
 from faker.providers import lorem
 from hamcrest import any_of, contains_string
 
-from awsjavakit_cfn_rules.rules import RULES_FOLDER, tags_checker
+from awsjavakit_cfn_rules.rules import tags_checker
 from tests import RESOURCES
 from tests.test_utils import ParsedJson, TestUtils
 
@@ -39,12 +39,8 @@ class TagsRuleTest:
         template = Template(failing_template.filename, failing_template.jsondoc)
         expected_tags = [fake.word(), fake.word()]
         config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
-        rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
-                                      ignore_rules=[],
-                                      include_experimental=False,
-                                      include_rules=[],
-                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
-                                      )
+        cfnlint_config = {tags_checker.TAGS_RULE_ID: config}
+        rules = TestUtils.load_all_rules(cfnlint_config)
         results = cfnlintcore.run_checks(filename=str(template.filename), rules=rules, regions=["eu-west-1"],
                                          template=template.template)
         failure = list(filter(lambda result: result.rule.id == tags_checker.TAGS_RULE_ID, results))[0]
@@ -57,13 +53,9 @@ class TagsRuleTest:
     def should_pass_when_required_tags_are_in_place(passing_template: ParsedJson):
         template = Template(passing_template.filename, passing_template.jsondoc)
         expected_tags = ["expectedTag"]
-        config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
-        rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
-                                      ignore_rules=[],
-                                      include_experimental=False,
-                                      include_rules=[],
-                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
-                                      )
+        rule_config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
+        cfnlint_config = {tags_checker.TAGS_RULE_ID: rule_config}
+        rules = TestUtils.load_all_rules(cfnlint_config)
         results = cfnlintcore.run_checks(filename=str(template.filename), rules=rules, regions=["eu-west-1"],
                                          template=template.template)
         failures = results
@@ -76,12 +68,8 @@ class TagsRuleTest:
         template = Template(failing_template.filename, failing_template.jsondoc)
         expected_tags = ["expectedTag"]
         config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
-        rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
-                                      ignore_rules=[],
-                                      include_experimental=False,
-                                      include_rules=[],
-                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
-                                      )
+        cfnlint_config = {tags_checker.TAGS_RULE_ID: config}
+        rules = TestUtils.load_all_rules(cfnlint_config)
         results = cfnlintcore.run_checks(filename=str(template.filename), rules=rules, regions=["eu-west-1"],
                                          template=template.template)
         for failure in results:
@@ -131,12 +119,8 @@ class TagsRuleTest:
     def _run_template_(expected_tags: list[str], resource: ParsedJson):
         config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags} if len(expected_tags) > 0 else {}
 
-        configuration = ConfigMixIn(cli_args=None, **config) # type: ignore
-        rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
-                                      ignore_rules=[],
-                                      include_experimental=False,
-                                      include_rules=[],
-                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
-                                      )
-        runner = TemplateRunner(resource.filename, resource.jsondoc, configuration, rules) # type: ignore
+        configuration = ConfigMixIn(cli_args=None, **config)  # type: ignore
+        cfnlint_config={tags_checker.TAGS_RULE_ID: config}
+        rules = TestUtils.load_all_rules(cfnlint_config)
+        runner = TemplateRunner(resource.filename, resource.jsondoc, configuration, rules)  # type: ignore
         return list(runner.run())
