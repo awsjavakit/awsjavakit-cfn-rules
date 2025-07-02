@@ -7,7 +7,6 @@ import pytest
 from assertpy import assert_that
 from cfnlint import ConfigMixIn, Template
 from cfnlint import core as cfnlintcore
-from cfnlint.runner import TemplateRunner
 from faker import Faker
 from faker.providers import lorem
 from hamcrest import any_of, contains_string
@@ -120,7 +119,7 @@ class TagsRuleTest:
         config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags} if len(expected_tags) > 0 else {}
 
         configuration = ConfigMixIn(cli_args=None, **config)  # type: ignore
-        cfnlint_config={tags_checker.TAGS_RULE_ID: config}
+        cfnlint_config = {tags_checker.TAGS_RULE_ID: config}
         rules = TestUtils.load_all_rules(cfnlint_config)
-        runner = TemplateRunner(resource.filename, resource.jsondoc, configuration, rules)  # type: ignore
-        return list(runner.run())
+        return TestUtils.run_validation(resource, configuration, rules)
+        

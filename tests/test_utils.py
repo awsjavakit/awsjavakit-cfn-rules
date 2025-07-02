@@ -4,7 +4,10 @@ from typing import Any
 import cfnlint
 import cfnlint.decode.cfn_yaml
 from attrs import define
+from cfnlint import ConfigMixIn
 from cfnlint import core as cfnlintcore
+from cfnlint.rules import Match
+from cfnlint.runner.template.runner import run_template_by_data
 
 from awsjavakit_cfn_rules.rules import RULES_FOLDER
 
@@ -33,5 +36,10 @@ class TestUtils:
                                      ignore_rules=[],
                                      include_experimental=False,
                                      include_rules=[],
-                                     configure_rules= cfnlint_rule_config if cfnlint_rule_config is not None else {}
+                                     configure_rules=cfnlint_rule_config if cfnlint_rule_config is not None else {}
                                      )
+
+    @staticmethod
+    def run_validation(resource: ParsedJson, configuration: ConfigMixIn, rules: dict[str, Any]) -> list[Match]:
+        return list(run_template_by_data(resource.jsondoc,configuration,rules)) # type: ignore
+        

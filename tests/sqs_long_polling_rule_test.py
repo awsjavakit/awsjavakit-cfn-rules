@@ -5,7 +5,6 @@ from collections.abc import Iterable
 import pytest
 from assertpy import assert_that
 from cfnlint import ConfigMixIn
-from cfnlint.runner import TemplateRunner
 
 from awsjavakit_cfn_rules.rules.sqs_long_polling_rule import ERROR_MESSAGE
 from tests import TEMPLATES
@@ -36,10 +35,9 @@ class SqsLongPollingRuleTest:
 
     @staticmethod
     def _run_template_(resource: ParsedJson):
-        mix_in = ConfigMixIn(cli_args=None)
+        configuration = ConfigMixIn(cli_args=None)
         rules = TestUtils.load_all_rules()
-        runner = TemplateRunner(resource.filename, resource.jsondoc, mix_in, rules)# type: ignore
-        return list(runner.run())
+        return TestUtils.run_validation(resource, configuration, rules)
 
     @staticmethod
     def failing_templates() -> list[ParsedJson]:
