@@ -2,7 +2,6 @@ from pathlib import Path
 
 from cfnlint import ConfigMixIn
 from cfnlint.match import Match
-from cfnlint.runner import TemplateRunner
 from hamcrest import assert_that, contains_string, equal_to, greater_than, is_
 
 from tests import TEMPLATES
@@ -43,8 +42,7 @@ class EventBridgeEventInputToLambdaRuleTest:
         
     @staticmethod
     def _run_template_(resource: ParsedJson)->list[Match]:
-        mix_in = ConfigMixIn(cli_args=None,**{"regions": ["eu-west-1"]})
+        configuration = ConfigMixIn(cli_args=None,**{"regions": ["eu-west-1"]})
         rules = TestUtils.load_all_rules()
-        runner = TemplateRunner(resource.filename, resource.jsondoc, mix_in, rules)  # type: ignore
-        return list(runner.run())
+        return TestUtils.run_validation(resource, configuration, rules)
     

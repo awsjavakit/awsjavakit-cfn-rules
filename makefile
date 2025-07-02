@@ -3,6 +3,7 @@
 
 .venv:
 	python -m venv .venv
+	. .venv/bin/activate && python -m pip install --upgrade pip && deactivate
 	. .venv/bin/activate && python -m pip install pipx && deactivate
 	. .venv/bin/activate && python -m pip install poetry==1.8.5 && deactivate
 	. .venv/bin/activate && pip install pytest-cov pytest-xdist && deactivate
@@ -18,7 +19,7 @@ build: .venv test
 	. .venv/bin/activate && poetry export -f requirements.txt --output requirements.txt && deactivate
 
 local-install: .venv build
-	. .venv/bin/activate && python -m pip install --force-reinstall dist/awsjavakit_cfn_rules-0.0.20-py3-none-any.whl && deactivate
+	. .venv/bin/activate && python -m pip install --force-reinstall dist/awsjavakit_cfn_rules-0.0.30-py3-none-any.whl && deactivate
 
 test: .venv
 	. .venv/bin/activate && poetry run pytest && deactivate

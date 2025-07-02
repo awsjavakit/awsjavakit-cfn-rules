@@ -9,7 +9,7 @@ Resources:
     Properties:
       AdditionalInfo: "Additional information about the instance"
       Affinity: "host"
-      AvailabilityZone: "us-west-2a"
+      AvailabilityZone: !Ref AWS::Region
       BlockDeviceMappings:
         - DeviceName: "/dev/sdh"
           Ebs:
@@ -32,7 +32,7 @@ Resources:
       HibernationOptions:
         Configured: false
       HostId: "host-id"
-      HostResourceGroupArn: "arn:aws:resource-groups:us-west-2:123456789012:group/my-resource-group"
+      HostResourceGroupArn: !Sub "arn:aws:resource-groups:${AWS::Region}:123456789012:group/my-resource-group"
       IamInstanceProfile: "arn:aws:iam::123456789012:instance-profile/my-iam-role"
       ImageId: "ami-0abcdef1234567890"
       InstanceInitiatedShutdownBehavior: "stop"
@@ -51,7 +51,7 @@ Resources:
       NetworkInterfaces:
         - AssociatePublicIpAddress: true
           DeviceIndex: 0
-          SubnetId: "subnet-0bb1c79de3EXAMPLE"
+          #SubnetId: "subnet-0bb1c79de3EXAMPLE"
       PlacementGroupName: "my-placement-group"
       PrivateDnsNameOptions:
         EnableResourceNameDnsARecord: true
@@ -66,13 +66,8 @@ Resources:
         - "my-security-group"
       SourceDestCheck: true
       SsmAssociations:
-        - AssociationId: "association-id"
-          DocumentName: "AWS-RunShellScript"
-          InstanceId: "i-1234567890abcdef0"
-          Parameters:
-            commands:
-              - "echo Hello World"
-      SubnetId: "subnet-0bb1c79de3EXAMPLE"
+        - DocumentName: "AWS-RunShellScript"
+      #SubnetId: "subnet-01234567"
       Tags:
         - Key: "Name"
           Value: "MyEC2Instance"
