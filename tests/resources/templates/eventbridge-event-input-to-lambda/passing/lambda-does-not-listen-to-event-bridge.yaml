@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  Dlq:
+    Type: String
+  SomeQueueArn:
+    Type: String
+
+Resources:
+
+  FunctionListeningToEventBridge:
+    Type: AWS::Serverless::Function
+    Properties:
+      Architectures: ['arm64']
+      CodeUri: .
+      Handler: some_package.handle_request
+      Runtime: python3.10
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !Ref SomeQueueArn
+            Enabled: True
+
+  SomeEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Some description
+      EventBusName: default
+      EventPattern: Json
+      Name: SomeRule
+      State: ENABLED
+      Targets:
+        - Arn: "arn:aws:sqs:eu-west-1:123456789012:SomeQueue"
+          Id: SomeRule
+        - Arn: !Ref SomeQueueArn
+          Id: SomeRule
+

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 import pytest
 from assertpy import assert_that
 from cfnlint import ConfigMixIn
-from cfnlint import core as cfnlintcore
 from cfnlint.runner import TemplateRunner
 
-from awsjavakit_cfn_rules.rules import RULES_FOLDER, tags_checker
 from awsjavakit_cfn_rules.rules.sqs_long_polling_rule import ERROR_MESSAGE
 from tests import TEMPLATES
 from tests.test_utils import ParsedJson, TestUtils
@@ -37,13 +37,8 @@ class SqsLongPollingRuleTest:
     @staticmethod
     def _run_template_(resource: ParsedJson):
         mix_in = ConfigMixIn(cli_args=None)
-        rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
-                                      ignore_rules=[],
-                                      include_experimental=False,
-                                      include_rules=[tags_checker.TAGS_RULE_ID],
-                                      configure_rules={}
-                                      )
-        runner = TemplateRunner(resource.filename, resource.jsondoc, mix_in, rules)
+        rules = TestUtils.load_all_rules()
+        runner = TemplateRunner(resource.filename, resource.jsondoc, mix_in, rules)# type: ignore
         return list(runner.run())
 
     @staticmethod
@@ -55,5 +50,5 @@ class SqsLongPollingRuleTest:
 
     @staticmethod
     @pytest.fixture(params=failing_templates())
-    def failing_template(request) -> ParsedJson:
+    def failing_template(request) -> Iterable[ParsedJson]:
         yield request.param

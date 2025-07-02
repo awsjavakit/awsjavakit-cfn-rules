@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 import hamcrest
 import pytest
 from assertpy import assert_that
@@ -10,7 +12,7 @@ from faker import Faker
 from faker.providers import lorem
 from hamcrest import any_of, contains_string
 
-from awsjavakit_cfn_rules.rules import RULES_FOLDER, tags_checker
+from awsjavakit_cfn_rules.rules import tags_checker
 from tests import RESOURCES
 from tests.test_utils import ParsedJson, TestUtils
 
@@ -37,13 +39,9 @@ class TagsRuleTest:
         template = Template(failing_template.filename, failing_template.jsondoc)
         expected_tags = [fake.word(), fake.word()]
         config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
-        rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
-                                      ignore_rules=[],
-                                      include_experimental=False,
-                                      include_rules=[],
-                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
-                                      )
-        results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
+        cfnlint_config = {tags_checker.TAGS_RULE_ID: config}
+        rules = TestUtils.load_all_rules(cfnlint_config)
+        results = cfnlintcore.run_checks(filename=str(template.filename), rules=rules, regions=["eu-west-1"],
                                          template=template.template)
         failure = list(filter(lambda result: result.rule.id == tags_checker.TAGS_RULE_ID, results))[0]
         hamcrest.assert_that(failure.message, any_of(
@@ -55,17 +53,13 @@ class TagsRuleTest:
     def should_pass_when_required_tags_are_in_place(passing_template: ParsedJson):
         template = Template(passing_template.filename, passing_template.jsondoc)
         expected_tags = ["expectedTag"]
-        config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
-        rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
-                                      ignore_rules=[],
-                                      include_experimental=False,
-                                      include_rules=[],
-                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
-                                      )
-        results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
+        rule_config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
+        cfnlint_config = {tags_checker.TAGS_RULE_ID: rule_config}
+        rules = TestUtils.load_all_rules(cfnlint_config)
+        results = cfnlintcore.run_checks(filename=str(template.filename), rules=rules, regions=["eu-west-1"],
                                          template=template.template)
         failures = results
-        assert_that(failures).is_empty().described_as(template.filename)
+        assert_that(failures).is_empty().described_as(str(template.filename))
 
     @staticmethod
     def should_report_resource_name_and_type_when_failing():
@@ -74,13 +68,9 @@ class TagsRuleTest:
         template = Template(failing_template.filename, failing_template.jsondoc)
         expected_tags = ["expectedTag"]
         config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
-        rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
-                                      ignore_rules=[],
-                                      include_experimental=False,
-                                      include_rules=[],
-                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
-                                      )
-        results = cfnlintcore.run_checks(filename=template.filename, rules=rules, regions=["eu-west-1"],
+        cfnlint_config = {tags_checker.TAGS_RULE_ID: config}
+        rules = TestUtils.load_all_rules(cfnlint_config)
+        results = cfnlintcore.run_checks(filename=str(template.filename), rules=rules, regions=["eu-west-1"],
                                          template=template.template)
         for failure in results:
             assert_that(failure.message).contains("UntaggedFunction").contains("AWS::Lambda::Function")
@@ -117,24 +107,20 @@ class TagsRuleTest:
 
     @staticmethod
     @pytest.fixture(params=failing_templates())
-    def failing_template(request) -> ParsedJson:
+    def failing_template(request) -> Iterable[ParsedJson]:
         yield request.param
 
     @staticmethod
     @pytest.fixture(params=passing_templates())
-    def passing_template(request) -> ParsedJson:
+    def passing_template(request) -> Iterable[ParsedJson]:
         yield request.param
 
     @staticmethod
     def _run_template_(expected_tags: list[str], resource: ParsedJson):
         config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags} if len(expected_tags) > 0 else {}
 
-        mix_in = ConfigMixIn(cli_args=None, **config)
-        rules = cfnlintcore.get_rules(append_rules=[str(RULES_FOLDER)],
-                                      ignore_rules=[],
-                                      include_experimental=False,
-                                      include_rules=[],
-                                      configure_rules={tags_checker.TAGS_RULE_ID: config}
-                                      )
-        runner = TemplateRunner(resource.filename, resource.jsondoc, mix_in, rules)
+        configuration = ConfigMixIn(cli_args=None, **config)  # type: ignore
+        cfnlint_config={tags_checker.TAGS_RULE_ID: config}
+        rules = TestUtils.load_all_rules(cfnlint_config)
+        runner = TemplateRunner(resource.filename, resource.jsondoc, configuration, rules)  # type: ignore
         return list(runner.run())
