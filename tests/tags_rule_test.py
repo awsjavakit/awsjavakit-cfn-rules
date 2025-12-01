@@ -13,7 +13,7 @@ from hamcrest import any_of, contains_string
 
 from awsjavakit_cfn_rules.rules import tags_checker
 from tests import RESOURCES
-from tests.test_utils import ParsedJson, TestUtils
+from tests.test_utils import ParsedTemplate, TestUtils
 
 CONFIG_MAP_IN_ROOT_FOLDER = {"main_key": "some_value"}
 
@@ -25,7 +25,7 @@ class TagsRuleTest:
 
     @staticmethod
     def should_fail_when_resource_does_not_have_tags():
-        resource_without_tags = TestUtils.parsed_template(
+        resource_without_tags = TestUtils.parse_template(
             RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
         expected_tags = ["expectedTag"]
         results = TagsRuleTest._run_template_(expected_tags, resource_without_tags)
@@ -34,7 +34,7 @@ class TagsRuleTest:
         assert_that(failure_ids).contains(tags_checker.TAGS_RULE_ID)
 
     @staticmethod
-    def should_report_missing_tag_as_specified_in_config(failing_template: ParsedJson):
+    def should_report_missing_tag_as_specified_in_config(failing_template: ParsedTemplate):
         template = Template(failing_template.filename, failing_template.jsondoc)
         expected_tags = [fake.word(), fake.word()]
         config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
@@ -49,7 +49,7 @@ class TagsRuleTest:
         ))
 
     @staticmethod
-    def should_pass_when_required_tags_are_in_place(passing_template: ParsedJson):
+    def should_pass_when_required_tags_are_in_place(passing_template: ParsedTemplate):
         template = Template(passing_template.filename, passing_template.jsondoc)
         expected_tags = ["expectedTag"]
         rule_config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags}
@@ -62,7 +62,7 @@ class TagsRuleTest:
 
     @staticmethod
     def should_report_resource_name_and_type_when_failing():
-        failing_template = TestUtils.parsed_template(
+        failing_template = TestUtils.parse_template(
             RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
         template = Template(failing_template.filename, failing_template.jsondoc)
         expected_tags = ["expectedTag"]
@@ -76,7 +76,7 @@ class TagsRuleTest:
 
     @staticmethod
     def should_not_fail_when_serverless_function_propagates_tags():
-        failing_template = TestUtils.parsed_template(
+        failing_template = TestUtils.parse_template(
             RESOURCES / "templates" / "tags_rule" / "passing" / "serverless_propagating_correct_tag.yaml")
 
         expected_tags = ["expectedTag"]
@@ -85,37 +85,37 @@ class TagsRuleTest:
 
     @staticmethod
     def should_accept_empty_config():
-        failing_template = TestUtils.parsed_template(
+        failing_template = TestUtils.parse_template(
             RESOURCES / "templates" / "tags_rule" / "failing" / "resource_without_tags.yaml")
         results = TagsRuleTest._run_template_([], failing_template)
         assert_that(results).is_empty()
 
     @staticmethod
-    def failing_templates() -> list[ParsedJson]:
+    def failing_templates() -> list[ParsedTemplate]:
         templates_folder = (RESOURCES / "templates" / "tags_rule" / "failing").absolute()
         template_files = TestUtils.get_templates(templates_folder)
-        parsed_jsons = map(TestUtils.parsed_template, template_files)
+        parsed_jsons = map(TestUtils.parse_template, template_files)
         return list(parsed_jsons)
 
     @staticmethod
-    def passing_templates() -> list[ParsedJson]:
+    def passing_templates() -> list[ParsedTemplate]:
         templates_folder = (RESOURCES / "templates" / "tags_rule" / "passing").absolute()
         template_files = TestUtils.get_templates(templates_folder)
-        parsed_jsons = map(TestUtils.parsed_template, template_files)
+        parsed_jsons = map(TestUtils.parse_template, template_files)
         return list(parsed_jsons)
 
     @staticmethod
     @pytest.fixture(params=failing_templates())
-    def failing_template(request) -> Iterable[ParsedJson]:
+    def failing_template(request) -> Iterable[ParsedTemplate]:
         yield request.param
 
     @staticmethod
     @pytest.fixture(params=passing_templates())
-    def passing_template(request) -> Iterable[ParsedJson]:
+    def passing_template(request) -> Iterable[ParsedTemplate]:
         yield request.param
 
     @staticmethod
-    def _run_template_(expected_tags: list[str], resource: ParsedJson):
+    def _run_template_(expected_tags: list[str], resource: ParsedTemplate):
         config = {tags_checker.EXPECTED_TAGS_FIELD_NAME: expected_tags} if len(expected_tags) > 0 else {}
 
         configuration = ConfigMixIn(cli_args=None, **config)  # type: ignore

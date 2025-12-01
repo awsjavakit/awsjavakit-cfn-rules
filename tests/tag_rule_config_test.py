@@ -12,7 +12,7 @@ from awsjavakit_cfn_rules.utils.invalid_config_exception import InvalidConfigExc
 class TagRuleConfigTest:
 
     @staticmethod
-    def should_create_tag_rules():
+    def should_create_one_tag_rule_per_tag():
         expected_tags_field_name = tags_checker.EXPECTED_TAGS_FIELD_NAME
         config_json = {
             expected_tags_field_name:["tag1", "tag2"]
@@ -24,7 +24,8 @@ class TagRuleConfigTest:
             TagRule(expected_tag="tag2")
         ]
         assert_that(rules, contains_inanyorder(*expected))
-
+    
+        
     @staticmethod
     def should_report_error_on_invalid_tag_rule_configuration():
         with pytest.raises(InvalidConfigException):
