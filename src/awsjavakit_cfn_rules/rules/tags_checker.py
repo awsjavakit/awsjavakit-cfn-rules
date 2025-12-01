@@ -39,7 +39,7 @@ NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
                           "AWS::SecretsManager::RotationSchedule",
                           "AWS::CloudFront::OriginAccessControl",
                           "AWS::CloudFront::CachePolicy",
-                          "AWSS::EC2::Route",
+                          "AWS::EC2::Route",
                           "AWS::EC2::SubnetRouteTableAssociation"
                           }
 TAGS_RULE_ID = "E9001"
