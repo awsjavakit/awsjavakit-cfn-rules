@@ -38,7 +38,9 @@ NON_TAGGABLE_RESOURCES = {"AWS::IAM::Policy",
                           "AWS::S3::BucketPolicy",
                           "AWS::SecretsManager::RotationSchedule",
                           "AWS::CloudFront::OriginAccessControl",
-                          "AWS::CloudFront::CachePolicy"
+                          "AWS::CloudFront::CachePolicy",
+                          "AWSS::EC2::Route",
+                          "AWS::EC2::SubnetRouteTableAssociation"
                           }
 TAGS_RULE_ID = "E9001"
 
@@ -87,7 +89,7 @@ class TagsRuleConfig:
 
     def _is_valid_format_(self, config: Any) -> bool:
         return isinstance(config, list)
-
+    
     def as_cfn_config(self) -> ConfigMixIn:
         return ConfigMixIn(cli_args=None, **{EXPECTED_TAGS_FIELD_NAME: self.rule_config_input})  # type: ignore
 
@@ -98,17 +100,20 @@ class TagRule:
 
     def validate_template(self, cfn: Template) -> list[RuleMatch]:
         resources = cfn.get_resources()
-        resource_keys = resources.keys()
-        taggable_resources: list[str] = \
-            [key for key in resource_keys if self._is_taggable_resource_(resources.get(key, EMPTY_DICT))]
+        taggable_resources: dict[str,Any]= \
+            {key: value for key,value in resources.items() if self._is_taggable_resource_(value) }
 
-        check_results: list[CheckResult] = \
-            [self._calculate_missing_tags_(resource_name=key, resource=resources.get(key, EMPTY_DICT)) \
-             for key in taggable_resources]
-        non_none_check_results: Iterable[CheckResult] = \
-            [result for result in check_results if result !=EMPTY_CHECK_RESULT]
-        matches = map(lambda check_result: check_result.as_rule_match(), non_none_check_results)
+        matches = self._calculate_matches_(taggable_resources)
         return list(matches)
+
+    def _calculate_matches_(self,  taggable_resources:dict[str,Any]):
+        check_results: list[CheckResult] = \
+            [self._calculate_missing_tags_(resource_name=key, resource=taggable_resources.get(key, EMPTY_DICT)) \
+             for key in taggable_resources]
+        non_empty_check_results: Iterable[CheckResult] = \
+            [result for result in check_results if result != EMPTY_CHECK_RESULT]
+        matches = map(lambda check_result: check_result.as_rule_match(), non_empty_check_results)
+        return matches
 
     def _is_taggable_resource_(self, resource: dict) -> bool:
         return self._type_of_(resource) not in NON_TAGGABLE_RESOURCES

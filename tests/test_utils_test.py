@@ -13,7 +13,7 @@ class TestUtilsTest:
 
     def should_parse_template(self):
         template_files = TestUtils.get_templates(TEMPLATES / "tags_rule" / "failing")
-        parsed_jsons = map(TestUtils.parsed_template, template_files)
+        parsed_jsons = map(TestUtils.parse_template, template_files)
         templates = map(lambda parsed_json: Template(parsed_json.filename, parsed_json.jsondoc), parsed_jsons)
         for template in templates:
             assert_that(template).is_instance_of(Template)

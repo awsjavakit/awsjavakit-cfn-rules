@@ -13,7 +13,7 @@ from awsjavakit_cfn_rules.rules import RULES_FOLDER
 
 
 @define
-class ParsedJson:
+class ParsedTemplate:
     filename: str
     jsondoc: dict[str, Any]
 
@@ -27,8 +27,8 @@ class TestUtils:
         return list(full_paths)
 
     @staticmethod
-    def parsed_template(file: Path) -> ParsedJson:
-        return ParsedJson(filename=str(file.absolute()), jsondoc=cfnlint.decode.cfn_yaml.load(file))
+    def parse_template(file: Path) -> ParsedTemplate:
+        return ParsedTemplate(filename=str(file.absolute()), jsondoc=cfnlint.decode.cfn_yaml.load(file))
 
     @staticmethod
     def load_all_rules(cfnlint_rule_config: dict[str, Any] | None = None):
@@ -40,6 +40,6 @@ class TestUtils:
                                      )
 
     @staticmethod
-    def run_validation(resource: ParsedJson, configuration: ConfigMixIn, rules: dict[str, Any]) -> list[Match]:
+    def run_validation(resource: ParsedTemplate, configuration: ConfigMixIn, rules: dict[str, Any]) -> list[Match]:
         return list(run_template_by_data(resource.jsondoc,configuration,rules)) # type: ignore
         
