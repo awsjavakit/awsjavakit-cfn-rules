@@ -39,11 +39,8 @@ class BatchJobDefinitionLogRule(CloudFormationLintRule):
             batch_job_definitions: dict[str, dict[str, Any]] = cfn.get_resources(BatchJobDefinitionEntry.type)
             job_definition_entries = map(lambda item: BatchJobDefinitionEntry(item[0], item[1]),
                                          batch_job_definitions.items())
-            entries_logging_to_cloudwatch_without_log_group: Iterable[BatchJobDefinitionEntry] = filter(
-                lambda entry: entry.is_sending_logs_to_cloudwatch(),
-                job_definition_entries)
             entries_logging_to_cloudwatch_without_log_group: Iterable[BatchJobDefinitionEntry] = \
-                filter(lambda entry: entry.has_no_log_group(),entries_logging_to_cloudwatch_without_log_group)
+                filter(lambda entry: entry.has_no_log_group(),job_definition_entries)
             matches: list[RuleMatch] = list(
                 map(lambda entry: entry.to_rule_match(), entries_logging_to_cloudwatch_without_log_group))
 
