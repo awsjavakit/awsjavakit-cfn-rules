@@ -25,7 +25,7 @@ class BatchJobDefinitionLogRuleTest:
     @staticmethod
     def should_report_fargate_jobs_without_logging_config():
         template = TestUtils.parse_template(TEMPLATES / "batch_job_logging" / "failing"
-                                            / "batch_job_definition_no_log_config_.yaml")
+                                            / "batch_job_definition_no_log_config.yaml")
         results = BatchJobDefinitionLogRuleTest._run_template_(template)
 
         assert_that(len(results)).described_as(str(results)).is_equal_to(1)

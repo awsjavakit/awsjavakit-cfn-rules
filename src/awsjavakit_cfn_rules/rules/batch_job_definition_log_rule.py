@@ -35,11 +35,11 @@ class BatchJobDefinitionLogRule(CloudFormationLintRule):
             batch_job_definitions: dict[str, dict[str, Any]] = cfn.get_resources(BatchJobDefinitionEntry.type)
             job_definition_entries: Iterable[BatchJobDefinitionEntry] = \
                 [BatchJobDefinitionEntry(item[0], item[1]) for item in batch_job_definitions.items()]
-            entries_logging_to_cloudwatch_without_log_group: Iterable[BatchJobDefinitionEntry] = \
+            misconfigured_entries: Iterable[BatchJobDefinitionEntry] = \
                 [entry for entry in job_definition_entries if entry.is_misconfigured()]
 
             matches: list[RuleMatch] = \
-                [entry.to_rule_match() for entry in entries_logging_to_cloudwatch_without_log_group]
+                [entry.to_rule_match() for entry in misconfigured_entries]
             return matches
         except Exception as e:
             logger.error(str(e))
