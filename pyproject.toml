@@ -13,7 +13,7 @@ package-mode = true
 
 [tool.poetry.dependencies]
 python = "^3.10.15"
-cfn-lint = "^1.42.0"
+cfn-lint = "^1.42.1"
 attrs = "24.2.0"
 
 
