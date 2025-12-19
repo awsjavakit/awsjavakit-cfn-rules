@@ -9,25 +9,21 @@ import attrs
 from cfnlint.rules import CloudFormationLintRule, RuleMatch
 from cfnlint.template.template import Template
 
-from awsjavakit_cfn_rules.rules.lambda_listens_to_event_bridge import EMPTY_STRING
+EMPTY_STRING = ""
 
 EMPTY_DICT = {}
 
-ERROR_MESSAGE = ("A BatchJobDefinition should have a valid log configuration and a log group with a retention period "
-                 "if Cloudwatch is used")
+ERROR_MESSAGE = ("A BatchJobDefinition should have a valid log configuration and a log group if CloudWatch is used")
 logger = logging.getLogger(__name__)
-handler = logging.StreamHandler(sys.stdout)
-logger.addHandler(handler)
-
 RULE_ID: str = "E9005"
 
 
 class BatchJobDefinitionLogRule(CloudFormationLintRule):
 
     id: str = RULE_ID
-    shortdesc: str = "Ensure that Fargate Job definitions have defined a log group with retention period"
-    description: str = "Ensure that Fargate Job definitions have defined a log group with retention period"
-    tags = ["Fargate", "Cloudwatch", "logs"]
+    shortdesc: str = "Ensure that Fargate Job definitions have defined a log group"
+    description: str = "Ensure that Fargate Job definitions have defined a log group"
+    tags = ["Batch", "CloudWatch", "logs"]
     experimental = False
 
     def __init__(self):
@@ -65,10 +61,10 @@ class BatchJobDefinitionEntry:
             .get("awslogs-group", EMPTY_STRING)
 
     def has_no_log_group(self):
-        return self.is_sending_logs_to_cloudwatch() and \
+        return self._is_sending_logs_to_cloudwatch() and \
             self.get_aws_log_group() == EMPTY_STRING
 
-    def is_sending_logs_to_cloudwatch(self) -> bool:
+    def _is_sending_logs_to_cloudwatch(self) -> bool:
         log_driver: str = self.entry.get("Properties", EMPTY_DICT) \
             .get("ContainerProperties", EMPTY_DICT) \
             .get("LogConfiguration", EMPTY_DICT) \
