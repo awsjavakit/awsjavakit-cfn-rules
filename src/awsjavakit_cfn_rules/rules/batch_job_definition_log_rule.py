@@ -13,6 +13,7 @@ EMPTY_STRING = ""
 EMPTY_DICT = {}
 
 ERROR_MESSAGE = "A BatchJobDefinition should have a valid log configuration and a log group if CloudWatch is used"
+
 logger = logging.getLogger(__name__)
 RULE_ID: str = "E9005"
 
