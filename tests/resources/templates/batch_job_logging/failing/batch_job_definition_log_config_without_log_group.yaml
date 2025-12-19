@@ -35,6 +35,9 @@ Resources:
           PlatformVersion: LATEST
         Image: !Sub '${ImageRepository.RepositoryUri}:latest'
         JobRoleArn: !GetAtt JobRole.Arn
+      Tags:
+        expected_tag1: tag1
+        expected_tag2: tag2
 
   ExecutionRole:
     Type: AWS::IAM::Role
@@ -105,6 +108,11 @@ Resources:
                 action:
                   type: expire
       RepositoryName: some-repository
+      Tags:
+        - Key: expected_tag1
+          Value: tag1
+        - Key: expected_tag2
+          Value: tag2
       RepositoryPolicyText:
         Version: "2012-10-17"
         Statement:

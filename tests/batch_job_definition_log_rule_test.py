@@ -12,8 +12,20 @@ from tests.test_utils import ParsedTemplate, TestUtils
 class BatchJobDefinitionLogRuleTest:
 
     @staticmethod
+    def should_report_fargate_jobs_with_cloudwatch_logging_config_without_log_group():
+        template = TestUtils.parse_template(TEMPLATES / "batch_job_logging" / "failing"
+                                            / "batch_job_definition_log_config_without_log_group.yaml")
+        results = BatchJobDefinitionLogRuleTest._run_template_(template)
+
+        assert_that(len(results)).described_as(str(results)).is_equal_to(1)
+        assert_that(results[0].message).is_equal_to(ERROR_MESSAGE)
+        resource_line_in_sample_file = 11
+        assert_that(results[0].linenumber).is_equal_to(resource_line_in_sample_file)
+
+    @staticmethod
     def should_report_fargate_jobs_without_logging_config():
-        template = TestUtils.parse_template(TEMPLATES / "batch_job_logging" / "failing" / "batch_job_definition.yaml")
+        template = TestUtils.parse_template(TEMPLATES / "batch_job_logging" / "failing"
+                                            / "batch_job_definition_no_log_config_.yaml")
         results = BatchJobDefinitionLogRuleTest._run_template_(template)
 
         assert_that(len(results)).described_as(str(results)).is_equal_to(1)

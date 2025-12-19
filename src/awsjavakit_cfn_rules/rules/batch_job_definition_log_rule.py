@@ -21,8 +21,8 @@ RULE_ID: str = "E9005"
 class BatchJobDefinitionLogRule(CloudFormationLintRule):
 
     id: str = RULE_ID
-    shortdesc: str = "Ensure that Fargate Job definitions have defined a log group"
-    description: str = "Ensure that Fargate Job definitions have defined a log group"
+    shortdesc: str = "Ensure that Fargate Job definitions have configured logging"
+    description: str = "Ensure that Fargate Job definitions have configured logging"
     tags = ["Batch", "CloudWatch", "logs"]
     experimental = False
 
@@ -36,7 +36,7 @@ class BatchJobDefinitionLogRule(CloudFormationLintRule):
             job_definition_entries: Iterable[BatchJobDefinitionEntry] = \
                 [BatchJobDefinitionEntry(item[0], item[1]) for item in batch_job_definitions.items()]
             entries_logging_to_cloudwatch_without_log_group: Iterable[BatchJobDefinitionEntry] = \
-                [entry for entry in job_definition_entries if entry.has_no_log_group()]
+                [entry for entry in job_definition_entries if entry.is_misconfigured()]
 
             matches: list[RuleMatch] = \
                 [entry.to_rule_match() for entry in entries_logging_to_cloudwatch_without_log_group]
@@ -54,21 +54,27 @@ class BatchJobDefinitionEntry:
     entry: dict[str, Any]
 
     def get_aws_log_group(self) -> str:
-        return self.entry.get("Properties", EMPTY_DICT) \
-            .get("ContainerProperties", EMPTY_DICT) \
-            .get("LogConfiguration", EMPTY_DICT) \
+        return self.get_log_configuration() \
             .get("Options", EMPTY_DICT) \
             .get("awslogs-group", EMPTY_STRING)
 
-    def has_no_log_group(self):
+    def get_log_configuration(self) -> dict[str, Any]:
+        return self.entry.get("Properties", EMPTY_DICT) \
+            .get("ContainerProperties", EMPTY_DICT) \
+            .get("LogConfiguration", EMPTY_DICT)
+
+    def is_misconfigured(self):
+        return self._has_no_configuration() or self._has_no_log_group()
+
+    def _has_no_configuration(self):
+        return self.get_log_configuration() == EMPTY_DICT
+
+    def _has_no_log_group(self):
         return self._is_sending_logs_to_cloudwatch() and \
             self.get_aws_log_group() == EMPTY_STRING
 
     def _is_sending_logs_to_cloudwatch(self) -> bool:
-        log_driver: str = self.entry.get("Properties", EMPTY_DICT) \
-            .get("ContainerProperties", EMPTY_DICT) \
-            .get("LogConfiguration", EMPTY_DICT) \
-            .get("LogDriver", EMPTY_STRING)
+        log_driver: str = self.get_log_configuration().get("LogDriver", EMPTY_STRING)
         return log_driver == BatchJobDefinitionEntry.cloudwatch_log_driver
 
     def to_rule_match(self) -> RuleMatch:
